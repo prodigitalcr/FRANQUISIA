@@ -6,286 +6,290 @@
     <title>SaaS Master - Control Total</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; overflow: hidden; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; overflow: hidden; height: 100vh; }
         .bg-master { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         .status-active { background-color: #dcfce7; color: #166534; }
         .status-inactive { background-color: #fee2e2; color: #991b1b; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Contenedor del sistema inyectado */
+        #systemIframeContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background: white;
+            display: none;
+        }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="flex items-center justify-center p-4">
 
-    <!-- PANTALLA DE ACCESO -->
-    <div id="loginScreen" class="fixed inset-0 bg-master z-[100] flex flex-col items-center justify-center p-4">
-        <div class="text-center mb-8">
-            <h1 class="text-5xl font-black text-white tracking-tighter mb-2">MASTER<span class="text-indigo-400">CONTROL</span></h1>
-            <p class="text-slate-400 uppercase text-[10px] tracking-[0.3em] font-bold">Gestión de Plataformas SaaS</p>
-        </div>
-
-        <div class="glass-card rounded-[2.5rem] p-10 w-full max-w-4xl shadow-2xl">
-            <div class="grid md:grid-cols-2 gap-10">
-                <!-- Dueño -->
-                <div class="p-8 border-2 border-slate-100 rounded-[2rem] bg-white">
-                    <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto"><i class="fas fa-store"></i></div>
-                    <h2 class="text-xl font-black text-center mb-6 uppercase text-slate-700">Dueño de Negocio</h2>
-                    <div class="space-y-4">
-                        <input type="text" id="owner_user" placeholder="Usuario" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:border-indigo-500 transition">
-                        <input type="password" id="owner_pass" placeholder="Contraseña" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:border-indigo-500 transition">
-                        <button onclick="loginOwner()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 transition shadow-lg">Entrar</button>
-                    </div>
-                </div>
-                <!-- Admin -->
-                <div class="p-8 bg-slate-900 rounded-[2rem] text-white">
-                    <div class="w-16 h-16 bg-slate-800 text-amber-400 rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto"><i class="fas fa-user-shield"></i></div>
-                    <h2 class="text-xl font-black text-center mb-6 uppercase">Super Administrador</h2>
-                    <div class="space-y-4">
-                        <input type="password" id="admin_pass_input" placeholder="Contraseña Maestra" class="w-full p-4 bg-slate-800 border border-slate-700 text-white rounded-2xl outline-none focus:border-amber-500 transition">
-                        <button onclick="loginAdmin()" class="w-full bg-amber-500 text-slate-900 font-black py-4 rounded-2xl hover:bg-amber-400 transition shadow-lg">Acceso Maestro</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- NAVEGACIÓN -->
-    <nav id="mainNav" class="bg-white border-b px-8 py-5 flex justify-between items-center hidden z-40 shadow-sm">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black"><i class="fas fa-rocket"></i></div>
-            <span class="font-black text-xl tracking-tight uppercase">Master<span class="text-indigo-600">Control</span></span>
-        </div>
-        <div class="flex items-center gap-6">
-            <div class="text-right hidden md:block">
-                <p id="navUserName" class="font-black text-slate-800 uppercase text-sm"></p>
-                <p id="navUserRole" class="text-[9px] uppercase font-black text-indigo-500 tracking-widest"></p>
-            </div>
-            <button onclick="logout()" class="w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center shadow-sm"><i class="fas fa-power-off"></i></button>
-        </div>
-    </nav>
-
-    <div id="mainContainer" class="flex-1 flex overflow-hidden hidden">
-        
-        <!-- DASHBOARD SUPER ADMIN -->
-        <main id="adminDashboard" class="flex-1 overflow-y-auto p-8 fade-in hidden bg-slate-50">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-                <div>
-                    <h2 class="text-4xl font-black text-slate-900 tracking-tighter">PANEL MAESTRO</h2>
-                    <p class="text-slate-500 text-sm font-medium">Control global de licencias y archivos del sistema.</p>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="showModal('modalAdminPass')" class="bg-slate-200 text-slate-700 px-5 py-3 rounded-xl font-bold hover:bg-slate-300 transition flex items-center gap-2">
-                        <i class="fas fa-lock"></i> Seguridad
-                    </button>
-                    <button onclick="showModal('modalNewOwner')" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-xl hover:bg-indigo-700 transition flex items-center gap-2">
-                        <i class="fas fa-plus"></i> Registrar Negocio
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stats & Config -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-                <div class="bg-white p-8 rounded-3xl border shadow-sm border-l-8 border-l-indigo-600">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Carga de App (.html)</p>
-                    <div class="flex flex-col gap-2">
-                        <input type="file" id="html_upload" accept=".html" class="hidden" onchange="uploadHtmlFile(this)">
-                        <button onclick="document.getElementById('html_upload').click()" class="bg-slate-100 hover:bg-indigo-50 text-indigo-600 border border-indigo-100 py-2 rounded-lg text-xs font-bold transition">
-                            <i class="fas fa-file-code mr-1"></i> Actualizar "WEB CANCHA"
-                        </button>
-                        <p id="html_status" class="text-[9px] text-slate-400 italic">No hay archivo cargado</p>
-                    </div>
-                </div>
-                <div class="bg-white p-8 rounded-3xl border shadow-sm border-l-8 border-l-amber-500">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Número SIMPE de Pago</p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <input type="text" id="simpe_config" class="text-2xl font-black w-40 border-none p-0 bg-transparent focus:ring-0 outline-none text-slate-800">
-                        <button onclick="updateSimpe()" class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-500 hover:text-white transition flex items-center justify-center"><i class="fas fa-save"></i></button>
-                    </div>
-                </div>
-                <div class="bg-white p-8 rounded-3xl border shadow-sm border-l-8 border-l-emerald-500">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Negocios Registrados</p>
-                    <h3 id="stat_total" class="text-4xl font-black text-slate-800">0</h3>
-                </div>
-            </div>
-
-            <!-- Tabla de Usuarios -->
-            <div class="bg-white rounded-[2.5rem] border shadow-sm overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        <tr>
-                            <th class="px-8 py-5">Negocio / Encargado</th>
-                            <th class="px-8 py-5">Usuario / Pass</th>
-                            <th class="px-8 py-5">Suscripción</th>
-                            <th class="px-8 py-5 text-right">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ownersTableBody" class="divide-y text-sm"></tbody>
-                </table>
-            </div>
-        </main>
-
-        <!-- DASHBOARD DUEÑO -->
-        <main id="ownerDashboard" class="flex-1 overflow-y-auto p-10 fade-in hidden bg-slate-50 flex flex-col items-center">
-            <div class="w-full max-w-4xl">
-                <!-- Status Card -->
-                <div id="ownerStatusCard" class="bg-white p-10 rounded-[3rem] shadow-2xl border flex flex-col md:flex-row items-center justify-between gap-10 mb-10 transform hover:scale-[1.01] transition-transform duration-500">
-                    <div class="flex items-center gap-8 text-center md:text-left">
-                        <div id="statusIconBox" class="w-24 h-24 rounded-[2rem] flex items-center justify-center text-4xl shadow-inner">
-                            <i id="statusIcon"></i>
-                        </div>
-                        <div>
-                            <h3 id="statusTitle" class="text-4xl font-black text-slate-900 mb-1 tracking-tighter uppercase">Verificando...</h3>
-                            <p id="statusDesc" class="text-sm font-bold text-slate-400 uppercase tracking-widest"></p>
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-center md:items-end gap-3">
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Pago vía SIMPE Móvil</p>
-                        <span id="simpeDisplay" class="text-4xl font-black text-indigo-600 bg-indigo-50 px-6 py-2 rounded-2xl">7228 4602</span>
-                        <button onclick="showModal('modalUploadPayment')" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-800 transition-all shadow-xl">Reportar Pago</button>
-                    </div>
-                </div>
-
-                <!-- Botón de App (Solo Liberado si pagó) -->
-                <div id="appContainer" class="hidden">
-                    <div class="bg-indigo-600 p-16 rounded-[4rem] text-center text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group">
-                        <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-700"></div>
-                        <div class="relative z-10">
-                            <div class="w-24 h-24 bg-white/20 rounded-[2.5rem] flex items-center justify-center text-4xl mx-auto mb-10 backdrop-blur-md shadow-xl transform group-hover:rotate-12 transition-transform">
-                                <i class="fas fa-futbol"></i>
-                            </div>
-                            <h2 class="text-5xl font-black mb-6 tracking-tighter uppercase">TU PLATAFORMA ESTÁ LISTA</h2>
-                            <p class="text-indigo-100 mb-12 max-w-md mx-auto text-lg font-medium opacity-80">Accede a tu sistema de gestión de canchas con todas las funciones liberadas.</p>
-                            
-                            <div class="flex flex-col gap-4 items-center">
-                                <button onclick="runWebCancha()" class="w-full max-w-sm bg-white text-indigo-600 px-10 py-6 rounded-3xl font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-indigo-50 hover:scale-105 transition-all duration-300">
-                                    <i class="fas fa-play mr-3"></i> Iniciar Sistema
-                                </button>
-                                <button onclick="downloadWebCancha()" class="text-indigo-200 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center gap-2 mt-4">
-                                    <i class="fas fa-download"></i> Descargar Respaldo (HTML)
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="appLocked" class="bg-slate-200 p-20 rounded-[4rem] text-center border-4 border-dashed border-slate-300">
-                    <i class="fas fa-lock text-6xl text-slate-400 mb-6"></i>
-                    <h3 class="text-2xl font-black text-slate-500 uppercase tracking-tighter">Acceso Restringido</h3>
-                    <p class="text-slate-400 font-medium">Reporta tu pago para liberar tu plataforma.</p>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- REPRODUCTOR DE LA APP (IFRAME A PANTALLA COMPLETA) -->
-    <div id="appPlayer" class="fixed inset-0 bg-slate-900 z-[200] hidden flex flex-col">
-        <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center shadow-2xl z-10">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fas fa-futbol"></i></div>
-                <div>
-                    <span class="font-black tracking-widest uppercase text-sm block">Sistema de Gestión Activo</span>
-                    <span id="playerBizName" class="text-[10px] text-indigo-300 uppercase font-bold tracking-widest block">Cancha Local</span>
-                </div>
-            </div>
-            <button onclick="closeAppPlayer()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2">
-                <i class="fas fa-times"></i> Cerrar Sistema
+    <!-- PANTALLA DE CARGA DEL SISTEMA (DENTRO DE LA PLATAFORMA) -->
+    <div id="systemIframeContainer">
+        <div class="h-16 bg-slate-900 text-white flex justify-between items-center px-6">
+            <span class="font-bold flex items-center gap-2">
+                <i class="fas fa-shield-alt text-blue-400"></i> Acceso Seguro Habilitado
+            </span>
+            <button onclick="closeSystem()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-sm transition-colors">
+                <i class="fas fa-times mr-2"></i>Cerrar Sistema
             </button>
         </div>
-        <!-- Contenedor del sistema -->
-        <iframe id="appFrame" class="flex-1 w-full h-full bg-white border-none rounded-t-[2rem] overflow-hidden"></iframe>
+        <iframe id="appSandbox" class="w-full h-[calc(100%-4rem)] border-none"></iframe>
     </div>
 
-    <!-- MODAL: CAMBIO PASS ADMIN -->
-    <div id="modalAdminPass" class="fixed inset-0 bg-slate-900/90 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] max-w-sm w-full p-10 shadow-2xl">
-            <h3 class="text-2xl font-black text-slate-800 mb-6 uppercase tracking-tight">Seguridad Maestro</h3>
-            <div class="space-y-4">
-                <input type="password" id="admin_new_pass" placeholder="Nueva Contraseña Maestra" class="w-full p-4 border rounded-2xl bg-slate-50 outline-none focus:border-indigo-500">
-                <button onclick="updateAdminPass()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-xl hover:bg-indigo-700">ACTUALIZAR LLAVE</button>
-                <button onclick="closeModal('modalAdminPass')" class="w-full text-slate-400 font-bold py-2 text-[10px] uppercase">Cancelar</button>
+    <!-- LOGIN SCREEN -->
+    <div id="loginSection" class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 space-y-6 fade-in">
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-2xl mb-4 shadow-lg">
+                <i class="fas fa-rocket text-2xl"></i>
             </div>
+            <h1 class="text-3xl font-extrabold text-slate-800">Master Control</h1>
+            <p class="text-slate-500 font-medium">Acceso Restringido para Socios</p>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Usuario</label>
+                <input id="loginUser" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Contraseña</label>
+                <input id="loginPass" type="password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95">
+                Verificar Acceso y Entrar
+            </button>
         </div>
     </div>
 
-    <!-- MODAL: NUEVO NEGOCIO -->
-    <div id="modalNewOwner" class="fixed inset-0 bg-slate-900/90 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-[3rem] max-w-md w-full p-12 shadow-2xl">
-            <h3 class="text-3xl font-black text-slate-800 mb-8 uppercase tracking-tighter">Nuevo Registro</h3>
-            <div class="space-y-4">
-                <input type="text" id="new_biz_name" placeholder="Nombre de la Cancha" class="w-full p-4 border rounded-2xl bg-slate-50 outline-none">
-                <input type="text" id="new_biz_manager" placeholder="Nombre del Encargado" class="w-full p-4 border rounded-2xl bg-slate-50 outline-none">
-                <input type="text" id="new_biz_phone" placeholder="WhatsApp (ej: 50688888888)" class="w-full p-4 border rounded-2xl bg-slate-50 outline-none">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="text" id="new_biz_user" placeholder="Usuario" class="w-full p-4 border rounded-2xl bg-slate-50 outline-none">
-                    <input type="text" id="new_biz_pass" placeholder="Contraseña" class="w-full p-4 border rounded-2xl bg-slate-50 outline-none">
+    <!-- MAIN PANEL -->
+    <div id="mainPanel" class="hidden w-full h-full max-w-6xl flex flex-col fade-in">
+        <header class="bg-master text-white p-6 rounded-t-3xl flex justify-between items-center shadow-lg">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 font-bold text-xl">
+                    <i id="headerIcon" class="fas fa-crown text-blue-400"></i>
                 </div>
-                <button onclick="saveNewOwner()" class="w-full bg-indigo-600 text-white py-5 rounded-[1.5rem] font-black shadow-xl mt-6 uppercase tracking-widest">Crear Acceso</button>
-                <button onclick="closeModal('modalNewOwner')" class="w-full text-slate-400 font-bold py-2 text-[10px] uppercase">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: CAMBIAR PASS ENCARGADO (ADMIN) -->
-    <div id="modalEditOwnerPass" class="fixed inset-0 bg-slate-900/90 hidden z-[100] flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] max-w-sm w-full p-10 shadow-2xl">
-            <h3 class="text-xl font-black text-slate-800 mb-4 uppercase">Resetear Contraseña</h3>
-            <input type="hidden" id="edit_owner_id">
-            <input type="text" id="new_owner_password_field" placeholder="Nueva Contraseña" class="w-full p-4 border rounded-2xl bg-slate-50 outline-none mb-6">
-            <div class="flex gap-4">
-                <button onclick="closeModal('modalEditOwnerPass')" class="flex-1 py-4 text-slate-400 font-bold text-xs uppercase">Cancelar</button>
-                <button onclick="confirmUpdateOwnerPass()" class="flex-1 bg-amber-500 text-white py-4 rounded-xl font-bold uppercase text-xs shadow-lg">Confirmar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: SUBIR PAGO (DUEÑO) -->
-    <div id="modalUploadPayment" class="fixed inset-0 bg-slate-900/90 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-md">
-        <div class="bg-white rounded-[3rem] max-w-sm w-full p-12 shadow-2xl text-center">
-            <h3 class="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tighter">Reportar Pago</h3>
-            <p class="text-xs text-slate-400 mb-8 uppercase font-bold tracking-widest">Comprobante de SIMPE Móvil</p>
-            <label class="block border-4 border-dashed border-indigo-50 bg-indigo-50/50 p-12 rounded-[2.5rem] cursor-pointer hover:bg-indigo-100 transition-all mb-8">
-                <div id="uploadPlaceholder">
-                    <i class="fas fa-cloud-upload-alt text-5xl text-indigo-400 mb-4"></i>
-                    <span class="block text-[10px] font-black text-indigo-600 uppercase">Seleccionar Captura</span>
+                <div>
+                    <h2 id="userNameDisplay" class="text-xl font-bold tracking-tight">Cargando...</h2>
+                    <p id="userTypeBadge" class="text-[10px] uppercase tracking-widest text-blue-300 font-bold bg-blue-500/10 px-2 py-0.5 rounded-md inline-block mt-1"></p>
                 </div>
-                <img id="receiptPreview" src="" class="hidden mx-auto max-h-48 rounded-2xl shadow-lg">
-                <input type="file" id="file_receipt" accept="image/*" class="hidden" onchange="previewReceipt(this)">
-            </label>
-            <button id="btnSendPay" onclick="submitPayment()" class="w-full bg-emerald-500 text-white py-5 rounded-2xl font-black shadow-xl hover:bg-emerald-600 transition-all uppercase tracking-widest">Enviar Comprobante</button>
-            <button onclick="closeModal('modalUploadPayment')" class="mt-4 text-slate-400 font-bold text-[10px] uppercase">Cerrar</button>
+            </div>
+            <button onclick="logout()" class="px-5 py-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl border border-red-500/30 transition-all text-sm font-bold">
+                Finalizar Sesión
+            </button>
+        </header>
+
+        <main id="dashboardContent" class="flex-grow bg-white p-6 rounded-b-3xl shadow-xl overflow-y-auto space-y-8">
+            <!-- VISTA SUPER ADMIN -->
+            <div id="adminView" class="hidden space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                        <p class="text-xs text-slate-500 font-bold uppercase mb-1">Socios Totales</p>
+                        <h3 id="statOwners" class="text-3xl font-black text-slate-800">0</h3>
+                    </div>
+                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                        <p class="text-xs text-slate-500 font-bold uppercase mb-1">Pagos Pendientes</p>
+                        <h3 id="statPending" class="text-3xl font-black text-amber-600">0</h3>
+                    </div>
+                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100 col-span-2 flex items-center gap-3">
+                        <button onclick="generateReport()" class="flex-1 flex items-center justify-center space-x-2 bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>Reporte de Ingresos</span>
+                        </button>
+                        <button onclick="showModal('modalUploadHTML')" class="p-4 bg-blue-100 text-blue-700 rounded-2xl hover:bg-blue-200 transition-all" title="Actualizar Sistema HTML">
+                            <i class="fas fa-code"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <section>
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-black text-slate-800">Gestión de Socios</h3>
+                        <div class="flex gap-2">
+                            <button onclick="showModal('modalAdminPass')" class="p-2 text-slate-400 hover:text-blue-600"><i class="fas fa-shield-alt text-xl"></i></button>
+                            <button onclick="showModal('modalAddOwner')" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg">
+                                <i class="fas fa-plus-circle mr-2"></i>Registrar Socio
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="ownersList"></div>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span> Validación de Comprobantes
+                    </h3>
+                    <div class="bg-slate-50 rounded-3xl p-2 border border-slate-100 overflow-hidden">
+                        <table class="w-full text-left">
+                            <tbody id="adminPaymentsList"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- VISTA DUEÑO DE NEGOCIO -->
+            <div id="ownerView" class="hidden space-y-8">
+                <div id="statusBanner" class="p-8 rounded-[2.5rem] border-2 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm">
+                    <div class="flex items-center space-x-6 text-center md:text-left">
+                        <div id="statusIcon" class="w-20 h-20 rounded-3xl flex items-center justify-center text-4xl shadow-inner"></div>
+                        <div>
+                            <h3 id="statusTitle" class="text-3xl font-black tracking-tight mb-1">Cargando...</h3>
+                            <p id="statusMsg" class="text-slate-500 font-medium"></p>
+                        </div>
+                    </div>
+                    <div id="ownerActions" class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <button onclick="showModal('modalUploadPayment')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all active:scale-95">
+                            <i class="fas fa-receipt mr-2"></i>Reportar Pago
+                        </button>
+                        <button id="ownerSystemBtn" onclick="launchSystem()" class="hidden bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all active:scale-95">
+                            <i class="fas fa-play-circle mr-2 text-blue-400"></i>Abrir Sistema Seguro
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-slate-50 p-8 rounded-[2.5rem] space-y-4 border border-slate-100">
+                        <h4 class="text-lg font-bold text-slate-800">Estado de Facturación</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-end border-b border-slate-200 pb-3">
+                                <span class="text-slate-400 text-sm font-semibold uppercase tracking-tighter">Mensualidad</span>
+                                <span class="font-black text-2xl text-blue-600">₡4,000</span>
+                            </div>
+                            <div class="flex justify-between items-end border-b border-slate-200 pb-3">
+                                <span class="text-slate-400 text-sm font-semibold uppercase tracking-tighter">SIMPE Móvil</span>
+                                <span id="simpeDisplay" class="font-bold text-lg text-slate-800"></span>
+                            </div>
+                            <div class="flex justify-between items-end">
+                                <span class="text-slate-400 text-sm font-semibold uppercase tracking-tighter">Próximo Vencimiento</span>
+                                <span id="expiryDisplay" class="font-black text-lg text-red-500">No definido</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/50 p-8 rounded-[2.5rem] border border-blue-100 flex flex-col justify-center">
+                        <h4 class="text-lg font-bold text-blue-800 mb-2">Acceso Blindado</h4>
+                        <p class="text-sm text-blue-600/80 leading-relaxed font-medium italic">
+                            "Para su seguridad, el link del sistema no es público. Solo puede accederse desde este panel mientras su cuenta esté activa. 
+                            Si el pago vence, el sistema se cerrará automáticamente y el acceso quedará denegado hasta la validación del próximo comprobante."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: ADD/EDIT OWNER -->
+    <div id="modalAddOwner" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl relative">
+            <h2 class="text-2xl font-black mb-6" id="ownerModalTitle">Registrar Nuevo Socio</h2>
+            <div class="space-y-4">
+                <input type="hidden" id="editOwnerId">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Nombre del Negocio</label>
+                    <input id="newOwnerName" type="text" placeholder="Ej: Cancha Los Robles" class="w-full p-4 bg-slate-50 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none border border-slate-100 font-semibold">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Usuario</label>
+                        <input id="newOwnerUser" type="text" placeholder="user123" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Password</label>
+                        <input id="newOwnerPass" type="password" placeholder="****" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold">
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-6">
+                    <button onclick="closeModal('modalAddOwner')" class="flex-1 bg-slate-100 py-4 rounded-2xl font-bold text-slate-500">Cancelar</button>
+                    <button onclick="saveNewOwner()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Guardar Socio</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL: REVISIÓN DE PAGOS (ADMIN) -->
-    <div id="modalPendingPayments" class="fixed inset-0 bg-slate-900/90 hidden z-[100] flex items-center justify-center p-4">
-        <div class="bg-white rounded-[3rem] max-w-2xl w-full p-12 shadow-2xl flex flex-col max-h-[85vh]">
-            <h3 class="text-3xl font-black text-slate-800 mb-8 uppercase tracking-tighter">Revisiones Pendientes</h3>
-            <div id="pendingList" class="flex-1 overflow-y-auto pr-4 space-y-4"></div>
-            <button onclick="closeModal('modalPendingPayments')" class="mt-8 py-4 bg-slate-100 text-slate-400 font-black rounded-2xl uppercase text-[10px] tracking-widest">Cerrar Ventana</button>
+    <!-- MODAL: SUBIR HTML DEL SISTEMA -->
+    <div id="modalUploadHTML" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
+            <h2 class="text-2xl font-black mb-2">Archivo Maestro</h2>
+            <p class="text-sm text-slate-500 mb-6">Sube el archivo .html que los socios activos podrán abrir.</p>
+            <div class="border-2 border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center justify-center bg-slate-50 relative">
+                <input type="file" id="systemHtmlFile" onchange="readSystemFile(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept=".html">
+                <i class="fas fa-file-code text-5xl text-blue-400 mb-4"></i>
+                <p id="fileNameLabel" class="text-sm font-bold text-slate-700">Arrastra el HTML aquí</p>
+                <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">Formatos: .html</p>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal('modalUploadHTML')" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold text-slate-500">Cerrar</button>
+                <button onclick="uploadSystemFile()" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">Actualizar Archivo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS RESTANTES (PAGOS, SEGURIDAD, RECIBOS) - MISMOS DE LA VERSIÓN ANTERIOR PERO ESTILIZADOS -->
+    <div id="modalViewReceipt" class="hidden fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[70] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl">
+            <img id="receiptImg" src="" class="w-full h-[30rem] object-contain bg-slate-50 p-6">
+            <div class="p-8 flex gap-4 bg-white border-t border-slate-100">
+                <button id="btnReject" class="flex-1 bg-red-100 text-red-600 py-4 rounded-2xl font-bold">Rechazar</button>
+                <button id="btnApprove" class="flex-1 bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg">Validar Pago</button>
+            </div>
+            <button onclick="closeModal('modalViewReceipt')" class="w-full py-4 text-slate-400 text-sm font-bold uppercase tracking-widest">Cerrar Visor</button>
+        </div>
+    </div>
+
+    <div id="modalUploadPayment" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
+            <h2 class="text-2xl font-black mb-4">Reportar Mensualidad</h2>
+            <div class="space-y-6">
+                <div class="border-2 border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center justify-center bg-slate-50 relative">
+                    <input type="file" id="receiptUpload" onchange="previewReceipt(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                    <div id="receiptPlaceholder" class="text-center">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-3"></i>
+                        <p class="text-sm font-bold text-slate-700">Subir Comprobante SIMPE</p>
+                    </div>
+                    <img id="receiptPreview" src="" class="hidden w-full h-40 object-contain rounded-2xl">
+                </div>
+                <button onclick="submitPayment()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black shadow-xl transition-all hover:bg-blue-700">ENVIAR COMPROBANTE (₡4,000)</button>
+                <button onclick="closeModal('modalUploadPayment')" class="w-full py-2 text-slate-400 font-bold uppercase text-xs tracking-widest">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAdminPass" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
+            <h2 class="text-2xl font-black mb-4">Contraseña Maestra</h2>
+            <input id="admin_new_pass" type="password" class="w-full p-4 bg-slate-50 rounded-xl mb-6 border border-slate-100 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nueva Contraseña de Administrador">
+            <div class="flex gap-3">
+                <button onclick="closeModal('modalAdminPass')" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold">Cerrar</button>
+                <button onclick="updateAdminPass()" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">Actualizar</button>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cancha-saas-master';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-        let currentUser = null; 
+        let currentUser = null;
         let currentOwnerData = null;
         let allOwners = [];
         let allPayments = [];
-        let configData = { simpe: '7228 4602', adminPass: 'admin', htmlContent: null };
+        let configData = {};
         let tempReceipt = null;
+        let tempSystemHtml = "";
 
-        // INICIO
         const initAuth = async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
@@ -294,286 +298,251 @@
             }
         };
 
-        initAuth().then(() => {
-            onAuthStateChanged(auth, (user) => {
-                if (user) syncData();
-            });
+        initAuth();
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) syncData();
         });
 
         function syncData() {
-            // Config Maestro
             onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), (s) => {
                 if(s.exists()) {
                     configData = s.data();
-                    document.getElementById('simpe_config').value = configData.simpe || '7228 4602';
                     document.getElementById('simpeDisplay').innerText = configData.simpe || '7228 4602';
-                    document.getElementById('html_status').innerText = configData.htmlContent ? 'Archivo HTML cargado correctamente' : 'No hay archivo cargado';
                 }
-            }, (error) => console.error("Error:", error));
+            }, (e) => console.error(e));
 
-            // Dueños
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'business_owners'), (s) => {
                 allOwners = s.docs.map(d => ({id: d.id, ...d.data()}));
+                checkExpirations();
                 if(currentUser === 'admin') renderAdmin();
-                else if(currentUser) renderOwner();
-            }, (error) => console.error("Error:", error));
+                else if(currentUser === 'owner') updateCurrentOwnerData();
+            }, (e) => console.error(e));
 
-            // Pagos
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), (s) => {
                 allPayments = s.docs.map(d => ({id: d.id, ...d.data()}));
                 if(currentUser === 'admin') renderAdmin();
-            }, (error) => console.error("Error:", error));
+            }, (e) => console.error(e));
         }
 
-        // ---------- LOGINS ----------
-        window.loginAdmin = () => {
-            const pass = document.getElementById('admin_pass_input').value;
-            if(pass === (configData.adminPass || 'admin')) {
+        async function checkExpirations() {
+            const today = new Date();
+            for(let owner of allOwners) {
+                if(owner.status === 'active' && owner.expiryDate) {
+                    const expiry = new Date(owner.expiryDate);
+                    if(today > expiry) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', owner.id), { status: 'inactive' });
+                    }
+                }
+            }
+        }
+
+        window.handleLogin = () => {
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            if(u === 'admin' && p === (configData.adminPass || 'master123')) {
                 currentUser = 'admin';
-                enterUI('Administrador', 'Master Control');
-            } else alert("Clave Maestra Incorrecta");
+                enterApp();
+            } else {
+                const owner = allOwners.find(o => o.user === u && o.pass === p);
+                if(owner) {
+                    currentOwnerData = owner;
+                    currentUser = 'owner';
+                    enterApp();
+                } else {
+                    alert("Acceso denegado. Revise sus credenciales.");
+                }
+            }
         };
 
-        window.loginOwner = () => {
-            const u = document.getElementById('owner_user').value;
-            const p = document.getElementById('owner_pass').value;
-            const found = allOwners.find(o => o.username === u && o.password === p);
-            if(found) {
-                currentUser = found.username;
-                currentOwnerData = found;
-                enterUI(found.managerName, found.bizName);
-                document.getElementById('playerBizName').innerText = found.bizName; // Setear nombre en el reproductor
-            } else alert("Credenciales de Dueño Inválidas");
-        };
-
-        function enterUI(name, role) {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainNav').classList.remove('hidden');
-            document.getElementById('mainContainer').classList.remove('hidden');
-            document.getElementById('navUserName').innerText = name;
-            document.getElementById('navUserRole').innerText = role;
-
+        function enterApp() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('mainPanel').classList.remove('hidden');
             if(currentUser === 'admin') {
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                document.getElementById('ownerDashboard').classList.add('hidden');
+                document.getElementById('adminView').classList.remove('hidden');
+                document.getElementById('ownerView').classList.add('hidden');
+                document.getElementById('userNameDisplay').innerText = "Super Administrador";
+                document.getElementById('userTypeBadge').innerText = "Master Control Unit";
                 renderAdmin();
             } else {
-                document.getElementById('adminDashboard').classList.add('hidden');
-                document.getElementById('ownerDashboard').classList.remove('hidden');
+                document.getElementById('adminView').classList.add('hidden');
+                document.getElementById('ownerView').classList.remove('hidden');
+                renderOwner();
+            }
+        }
+
+        function updateCurrentOwnerData() {
+            const fresh = allOwners.find(o => o.id === currentOwnerData.id);
+            if(fresh) {
+                currentOwnerData = fresh;
                 renderOwner();
             }
         }
 
         window.logout = () => location.reload();
 
-        // ---------- FUNCIONES ADMIN ----------
-        window.updateAdminPass = async () => {
-            const n = document.getElementById('admin_new_pass').value;
-            if(!n) return;
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), { adminPass: n }, { merge: true });
-            alert("Contraseña Maestra Actualizada");
-            closeModal('modalAdminPass');
-        };
+        // ---------- SISTEMA SEGURO (IFRAME) ----------
+        window.launchSystem = () => {
+            // Verificación final antes de abrir: El estado debe ser active en memoria local segura
+            if(currentOwnerData.status !== 'active') return alert("Tu acceso ha expirado. Por favor realiza el pago.");
+            if(!configData.systemHtml) return alert("El Administrador aún no ha cargado el sistema maestro.");
 
-        window.updateSimpe = async () => {
-            const n = document.getElementById('simpe_config').value;
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), { simpe: n }, { merge: true });
-            alert("Número SIMPE actualizado");
-        };
-
-        window.uploadHtmlFile = (input) => {
-            const file = input.files[0];
-            if(!file) return;
+            const container = document.getElementById('systemIframeContainer');
+            const iframe = document.getElementById('appSandbox');
             
-            // Validación para asegurar que el archivo no supere el límite de Firestore (1MB)
-            if (file.size > 950000) {
-                alert("Error: El archivo es muy grande (supera 1MB). Por favor, asegúrate de no incluir imágenes en base64 demasiado pesadas dentro del HTML.");
-                input.value = ""; // Limpiar input
-                return;
-            }
+            // Inyectar el código HTML almacenado en Firestore
+            const blob = new Blob([configData.systemHtml], { type: 'text/html' });
+            iframe.src = URL.createObjectURL(blob);
+            container.style.display = 'block';
+        };
 
+        window.closeSystem = () => {
+            const iframe = document.getElementById('appSandbox');
+            iframe.src = "about:blank";
+            document.getElementById('systemIframeContainer').style.display = 'none';
+        };
+
+        // ---------- ADMIN FUNCTIONS ----------
+        function renderAdmin() {
+            document.getElementById('statOwners').innerText = allOwners.length;
+            const pending = allPayments.filter(p => p.status === 'pending');
+            document.getElementById('statPending').innerText = pending.length;
+
+            const oList = document.getElementById('ownersList');
+            oList.innerHTML = '';
+            allOwners.forEach(o => {
+                const card = document.createElement('div');
+                card.className = "p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm flex flex-col justify-between hover:shadow-md transition-all";
+                card.innerHTML = `
+                    <div class="mb-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-black text-slate-800 leading-tight">${o.name}</h4>
+                            <span class="text-[9px] px-2 py-1 rounded-lg font-black uppercase ${o.status === 'active' ? 'status-active' : 'status-inactive'}">
+                                ${o.status === 'active' ? 'Acceso OK' : 'Bloqueado'}
+                            </span>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Expira: ${o.expiryDate ? new Date(o.expiryDate).toLocaleDateString() : 'N/A'}</p>
+                    </div>
+                    <div class="flex gap-2 border-t border-slate-50 pt-4">
+                        <button onclick="editOwner('${o.id}')" class="flex-1 bg-slate-50 text-slate-500 py-2 rounded-xl text-xs font-bold hover:bg-blue-50 hover:text-blue-600 transition-colors">Editar</button>
+                        <button onclick="deleteOwner('${o.id}')" class="bg-red-50 text-red-500 p-2 rounded-xl text-xs hover:bg-red-500 hover:text-white transition-colors"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                oList.appendChild(card);
+            });
+
+            const pList = document.getElementById('adminPaymentsList');
+            pList.innerHTML = '';
+            pending.forEach(p => {
+                const owner = allOwners.find(o => o.id === p.ownerId);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-6">
+                        <div class="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-100">
+                            <div>
+                                <p class="font-black text-slate-800">${owner?.name || 'Usuario'}</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Monto Recibido: ₡4,000</p>
+                            </div>
+                            <button onclick="reviewReceipt('${p.id}', '${p.receiptImg}')" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg">Revisar Pago</button>
+                        </div>
+                    </td>
+                `;
+                pList.appendChild(tr);
+            });
+        }
+
+        window.readSystemFile = (input) => {
+            const f = input.files[0];
             const reader = new FileReader();
-            reader.onload = async (e) => {
-                const content = e.target.result;
-                try {
-                    document.getElementById('html_status').innerText = "Guardando archivo en la nube...";
-                    // Usamos setDoc con merge: true para crearlo si no existe
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), { htmlContent: content }, { merge: true });
-                    alert("Plataforma HTML actualizada correctamente.");
-                } catch (error) {
-                    console.error("Error al subir archivo:", error);
-                    alert("Hubo un error guardando el archivo. Intenta de nuevo.");
-                }
+            reader.onload = (e) => {
+                tempSystemHtml = e.target.result;
+                document.getElementById('fileNameLabel').innerText = f.name;
+                document.getElementById('fileNameLabel').className = "text-sm font-black text-blue-600";
             };
-            reader.readAsText(file);
+            reader.readAsText(f);
+        };
+
+        window.uploadSystemFile = async () => {
+            if(!tempSystemHtml) return alert("Selecciona un archivo HTML primero.");
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), { systemHtml: tempSystemHtml }, { merge: true });
+            alert("Sistema Maestro actualizado correctamente para todos los socios.");
+            closeModal('modalUploadHTML');
         };
 
         window.saveNewOwner = async () => {
-            const data = {
-                bizName: document.getElementById('new_biz_name').value,
-                managerName: document.getElementById('new_biz_manager').value,
-                phone: document.getElementById('new_biz_phone').value,
-                username: document.getElementById('new_biz_user').value,
-                password: document.getElementById('new_biz_pass').value,
-                status: 'inactive',
-                expirationDate: null,
-                createdAt: new Date().toISOString()
-            };
-            if(!data.bizName || !data.username) return alert("Nombre y Usuario requeridos");
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'business_owners'), data);
-            alert("Dueño registrado con éxito");
-            closeModal('modalNewOwner');
+            const name = document.getElementById('newOwnerName').value;
+            const user = document.getElementById('newOwnerUser').value;
+            const pass = document.getElementById('newOwnerPass').value;
+            const id = document.getElementById('editOwnerId').value;
+            if(!name || !user || !pass) return alert("Faltan campos obligatorios");
+
+            const data = { name, user, pass, status: id ? allOwners.find(o=>o.id===id).status : 'inactive' };
+            if(id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id), data);
+            else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'business_owners'), data);
+            
+            closeModal('modalAddOwner');
+            document.getElementById('editOwnerId').value = '';
         };
 
-        function renderAdmin() {
-            document.getElementById('stat_total').innerText = allOwners.length;
-            const tbody = document.getElementById('ownersTableBody');
-            const now = new Date();
-
-            tbody.innerHTML = allOwners.map(o => {
-                const exp = o.expirationDate ? new Date(o.expirationDate) : null;
-                const active = exp && exp > now && o.status === 'active';
-                return `
-                <tr class="hover:bg-slate-50 transition border-b">
-                    <td class="px-8 py-5">
-                        <div class="font-black text-slate-800 uppercase text-xs">${o.bizName}</div>
-                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">${o.managerName}</div>
-                    </td>
-                    <td class="px-8 py-5">
-                        <div class="font-mono text-xs text-indigo-600 font-bold">${o.username}</div>
-                        <div class="text-[9px] text-slate-400 font-bold uppercase">Clave: ${o.password}</div>
-                    </td>
-                    <td class="px-8 py-5">
-                        <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase ${active ? 'status-active' : 'status-inactive'}">
-                            ${active ? 'Activa' : 'Inactiva'}
-                        </span>
-                        <div class="text-[9px] text-slate-400 mt-1 uppercase font-bold tracking-tighter">${exp ? 'Vence: ' + exp.toLocaleDateString() : 'Sin Fecha'}</div>
-                    </td>
-                    <td class="px-8 py-5 text-right flex justify-end gap-2">
-                        <button onclick="openEditOwnerPass('${o.id}')" class="w-8 h-8 rounded-lg bg-slate-100 text-amber-500 hover:bg-amber-500 hover:text-white transition flex items-center justify-center"><i class="fas fa-key text-xs"></i></button>
-                        <a href="https://wa.me/${o.phone}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 hover:bg-emerald-500 hover:text-white transition flex items-center justify-center"><i class="fab fa-whatsapp text-xs"></i></a>
-                        <button onclick="deleteOwner('${o.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-
-            // Pagos Pendientes
-            const pends = allPayments.filter(p => p.status === 'pending');
-            if(pends.length > 0) {
-                renderPendingPayments(pends);
-                showModal('modalPendingPayments');
-            }
-        }
-
-        function renderPendingPayments(list) {
-            const container = document.getElementById('pendingList');
-            container.innerHTML = list.map(p => {
-                const owner = allOwners.find(o => o.id === p.ownerId);
-                return `
-                <div class="bg-slate-50 p-6 rounded-3xl border flex items-center justify-between gap-6">
-                    <img src="${p.receiptImg}" class="w-20 h-20 object-cover rounded-2xl shadow-md border cursor-pointer hover:scale-110 transition" onclick="window.open(this.src)">
-                    <div class="flex-1">
-                        <p class="font-black text-slate-800 uppercase text-xs">${owner?.bizName || 'Desconocido'}</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${new Date(p.timestamp).toLocaleString()}</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="rejectPay('${p.id}')" class="px-4 py-2 bg-red-100 text-red-600 rounded-xl font-black text-[10px] uppercase">Rechazar</button>
-                        <button onclick="approvePay('${p.id}', '${p.ownerId}')" class="px-4 py-2 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase shadow-lg">Aprobar +30 Días</button>
-                    </div>
-                </div>
-                `;
-            }).join('');
-        }
-
-        window.approvePay = async (payId, ownerId) => {
-            const owner = allOwners.find(o => o.id === ownerId);
-            let nextExp = new Date();
-            if(owner.expirationDate && new Date(owner.expirationDate) > nextExp) {
-                nextExp = new Date(owner.expirationDate);
-            }
-            nextExp.setDate(nextExp.getDate() + 30);
-
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', payId), { status: 'approved' });
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', ownerId), {
-                status: 'active',
-                expirationDate: nextExp.toISOString()
-            });
-            alert("Pago Verificado. Licencia extendida.");
-            closeModal('modalPendingPayments');
+        window.reviewReceipt = (pId, img) => {
+            document.getElementById('receiptImg').src = img;
+            showModal('modalViewReceipt');
+            document.getElementById('btnApprove').onclick = () => processPayment(pId, 'approve');
+            document.getElementById('btnReject').onclick = () => processPayment(pId, 'reject');
         };
 
-        window.rejectPay = async (id) => {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', id), { status: 'rejected' });
-            alert("Pago rechazado");
-            closeModal('modalPendingPayments');
-        };
-
-        window.openEditOwnerPass = (id) => {
-            document.getElementById('edit_owner_id').value = id;
-            showModal('modalEditOwnerPass');
-        };
-
-        window.confirmUpdateOwnerPass = async () => {
-            const id = document.getElementById('edit_owner_id').value;
-            const pass = document.getElementById('new_owner_password_field').value;
-            if(!pass) return;
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id), { password: pass });
-            alert("Contraseña de Encargado Actualizada");
-            closeModal('modalEditOwnerPass');
-        };
-
-        window.deleteOwner = async (id) => {
-            if(confirm("¿Eliminar negocio para siempre?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id));
-            }
-        };
-
-        // ---------- FUNCIONES DUEÑO ----------
-        function renderOwner() {
-            currentOwnerData = allOwners.find(o => o.username === currentUser);
-            if(!currentOwnerData) return;
-
-            const title = document.getElementById('statusTitle');
-            const desc = document.getElementById('statusDesc');
-            const box = document.getElementById('statusIconBox');
-            const icon = document.getElementById('statusIcon');
-            const now = new Date();
-            const exp = currentOwnerData.expirationDate ? new Date(currentOwnerData.expirationDate) : null;
-            const active = exp && exp > now && currentOwnerData.status === 'active';
-            const pending = allPayments.some(p => p.ownerId === currentOwnerData.id && p.status === 'pending');
-
-            if(pending) {
-                title.innerText = "EN REVISIÓN";
-                desc.innerText = "Estamos validando tu pago.";
-                box.className = "w-24 h-24 rounded-[2rem] flex items-center justify-center text-4xl shadow-inner bg-amber-50 text-amber-500 animate-pulse";
-                icon.className = "fas fa-clock";
-                document.getElementById('appContainer').classList.add('hidden');
-                document.getElementById('appLocked').classList.remove('hidden');
-            } else if (active) {
-                title.innerText = "ACCESO LIBERADO";
-                desc.innerText = "Vence el: " + exp.toLocaleDateString();
-                box.className = "w-24 h-24 rounded-[2rem] flex items-center justify-center text-4xl shadow-inner bg-emerald-50 text-emerald-500";
-                icon.className = "fas fa-check-circle";
-                document.getElementById('appContainer').classList.remove('hidden');
-                document.getElementById('appLocked').classList.add('hidden');
+        async function processPayment(pId, action) {
+            const p = allPayments.find(pay => pay.id === pId);
+            if(action === 'approve') {
+                const nextExp = new Date();
+                nextExp.setDate(nextExp.getDate() + 30);
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', p.ownerId), { 
+                    status: 'active',
+                    expiryDate: nextExp.toISOString()
+                });
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', pId), { status: 'approved' });
+                alert("Socio activado por 30 días.");
             } else {
-                title.innerText = "LICENCIA VENCIDA";
-                desc.innerText = "Realiza tu pago para activar.";
-                box.className = "w-24 h-24 rounded-[2rem] flex items-center justify-center text-4xl shadow-inner bg-red-50 text-red-500";
-                icon.className = "fas fa-lock";
-                document.getElementById('appContainer').classList.add('hidden');
-                document.getElementById('appLocked').classList.remove('hidden');
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', pId), { status: 'rejected' });
+                alert("Pago denegado.");
+            }
+            closeModal('modalViewReceipt');
+        }
+
+        // ---------- OWNER FUNCTIONS ----------
+        function renderOwner() {
+            document.getElementById('userNameDisplay').innerText = currentOwnerData.name;
+            document.getElementById('expiryDisplay').innerText = currentOwnerData.expiryDate ? new Date(currentOwnerData.expiryDate).toLocaleDateString() : 'Pendiente';
+
+            const banner = document.getElementById('statusBanner');
+            const icon = document.getElementById('statusIcon');
+            const title = document.getElementById('statusTitle');
+            const msg = document.getElementById('statusMsg');
+            const sysBtn = document.getElementById('ownerSystemBtn');
+
+            if(currentOwnerData.status === 'active') {
+                banner.className = "p-8 rounded-[2.5rem] border-2 status-active border-emerald-100 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm";
+                icon.className = "w-20 h-20 rounded-3xl flex items-center justify-center text-4xl bg-emerald-200 text-emerald-700 shadow-inner";
+                icon.innerHTML = '<i class="fas fa-check-shield"></i>';
+                title.innerText = "Acceso Autorizado";
+                msg.innerText = "Su mensualidad está al día. El sistema seguro está listo.";
+                sysBtn.classList.remove('hidden');
+            } else {
+                banner.className = "p-8 rounded-[2.5rem] border-2 status-inactive border-red-100 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm";
+                icon.className = "w-20 h-20 rounded-3xl flex items-center justify-center text-4xl bg-red-200 text-red-700 shadow-inner";
+                icon.innerHTML = '<i class="fas fa-lock text-red-500"></i>';
+                title.innerText = "Acceso Denegado";
+                msg.innerText = "Por favor, reporte su pago de ₡4,000 para habilitar el servicio.";
+                sysBtn.classList.add('hidden');
             }
         }
 
         window.previewReceipt = (input) => {
             const f = input.files[0];
-            if(!f) return;
             const r = new FileReader();
             r.onload = (e) => {
                 tempReceipt = e.target.result;
-                document.getElementById('uploadPlaceholder').classList.add('hidden');
+                document.getElementById('receiptPlaceholder').classList.add('hidden');
                 document.getElementById('receiptPreview').src = tempReceipt;
                 document.getElementById('receiptPreview').classList.remove('hidden');
             };
@@ -581,51 +550,48 @@
         };
 
         window.submitPayment = async () => {
-            if(!tempReceipt) return alert("Sube el comprobante primero");
+            if(!tempReceipt) return alert("Adjunte la imagen del comprobante.");
             await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), {
                 ownerId: currentOwnerData.id,
                 status: 'pending',
                 receiptImg: tempReceipt,
                 timestamp: new Date().toISOString()
             });
-            alert("Pago enviado a revisión.");
+            alert("Comprobante enviado. Su sistema se habilitará tras la validación.");
             closeModal('modalUploadPayment');
         };
 
-        // ---------- NUEVO: EJECUTAR LA APP DIRECTAMENTE ----------
-        window.runWebCancha = () => {
-            if(!configData.htmlContent) return alert("El Administrador aún no ha subido el archivo del sistema.");
-            
-            // Convertimos el contenido HTML guardado en un objeto visible para el iframe
-            const blob = new Blob([configData.htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            
-            // Asignamos la URL al iframe y mostramos el reproductor
-            document.getElementById('appFrame').src = url;
-            document.getElementById('appPlayer').classList.remove('hidden');
+        window.generateReport = () => {
+            const { jsPDF } = window.jspdf;
+            const d = new jsPDF();
+            d.setFontSize(22); d.text("SaaS Master - Control de Ingresos", 14, 25);
+            d.setFontSize(10); d.text(`Fecha de Reporte: ${new Date().toLocaleString()}`, 14, 32);
+            const data = allOwners.map(o => [o.name, o.user, o.status === 'active' ? 'ACTIVO' : 'BLOQUEADO', o.expiryDate ? new Date(o.expiryDate).toLocaleDateString() : 'N/A']);
+            d.autoTable({ startY: 40, head: [['Negocio', 'Usuario', 'Estado Acceso', 'Vence']], body: data, theme: 'striped', headStyles: { fillColor: [15, 23, 42] } });
+            d.save(`Reporte_Ingresos_SaaS_${new Date().toLocaleDateString()}.pdf`);
         };
 
-        // Cerrar el reproductor
-        window.closeAppPlayer = () => {
-            document.getElementById('appPlayer').classList.add('hidden');
-            document.getElementById('appFrame').src = ''; // Limpiamos el iframe
-        };
-
-        // Descarga tradicional (Mantenida como respaldo)
-        window.downloadWebCancha = () => {
-            if(!configData.htmlContent) return alert("El Administrador aún no ha subido el archivo del sistema.");
-            const blob = new Blob([configData.htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'WEB_CANCHA_SISTEMA.html';
-            a.click();
-            URL.revokeObjectURL(url);
-        };
-
-        // UTILS
+        // UI UTILS
         window.showModal = (id) => document.getElementById(id).classList.remove('hidden');
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+        window.editOwner = (id) => {
+            const o = allOwners.find(x => x.id === id);
+            document.getElementById('ownerModalTitle').innerText = "Editar Datos del Socio";
+            document.getElementById('newOwnerName').value = o.name;
+            document.getElementById('newOwnerUser').value = o.user;
+            document.getElementById('newOwnerPass').value = o.pass;
+            document.getElementById('editOwnerId').value = o.id;
+            showModal('modalAddOwner');
+        };
+        window.deleteOwner = async (id) => {
+            if(confirm("¿Desea eliminar este socio y revocar todos sus accesos?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id));
+        };
+        window.updateAdminPass = async () => {
+            const n = document.getElementById('admin_new_pass').value;
+            if(n) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), { adminPass: n }, { merge: true });
+            alert("Contraseña maestra actualizada.");
+            closeModal('modalAdminPass');
+        };
 
     </script>
 </body>
