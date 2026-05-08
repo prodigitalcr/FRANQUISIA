@@ -31,7 +31,7 @@
 </head>
 <body class="flex items-center justify-center p-4">
 
-    <!-- PANTALLA DE CARGA DEL SISTEMA -->
+    <!-- PANTALLA DE CARGA DEL SISTEMA (SANDBOX) -->
     <div id="systemIframeContainer">
         <div class="h-16 bg-slate-900 text-white flex justify-between items-center px-6">
             <span class="font-bold flex items-center gap-2">
@@ -44,31 +44,31 @@
         <iframe id="appSandbox" class="w-full h-[calc(100%-4rem)] border-none"></iframe>
     </div>
 
-    <!-- LOGIN SCREEN -->
+    <!-- PANTALLA DE LOGIN -->
     <div id="loginSection" class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 space-y-6 fade-in">
         <div class="text-center">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-2xl mb-4 shadow-lg">
                 <i class="fas fa-rocket text-2xl"></i>
             </div>
             <h1 class="text-3xl font-extrabold text-slate-800">Master Control</h1>
-            <p class="text-slate-500 font-medium">Acceso Restringido para Socios</p>
+            <p class="text-slate-500 font-medium">Franquicia Futuro - Acceso Socios</p>
         </div>
         <div class="space-y-4">
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Usuario</label>
-                <input id="loginUser" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input id="loginUser" type="text" placeholder="Tu usuario" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Contraseña</label>
-                <input id="loginPass" type="password" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input id="loginPass" type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95">
-                Verificar Acceso y Entrar
+                Verificar Credenciales
             </button>
         </div>
     </div>
 
-    <!-- MAIN PANEL -->
+    <!-- PANEL PRINCIPAL -->
     <div id="mainPanel" class="hidden w-full h-full max-w-6xl flex flex-col fade-in">
         <header class="bg-master text-white p-6 rounded-t-3xl flex justify-between items-center shadow-lg">
             <div class="flex items-center space-x-4">
@@ -81,12 +81,13 @@
                 </div>
             </div>
             <button onclick="logout()" class="px-5 py-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl border border-red-500/30 transition-all text-sm font-bold">
-                Finalizar Sesión
+                Cerrar Sesión
             </button>
         </header>
 
         <main id="dashboardContent" class="flex-grow bg-white p-6 rounded-b-3xl shadow-xl overflow-y-auto space-y-8">
-            <!-- VISTA SUPER ADMIN -->
+            
+            <!-- CONTENIDO ADMINISTRADOR -->
             <div id="adminView" class="hidden space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
@@ -94,15 +95,15 @@
                         <h3 id="statOwners" class="text-3xl font-black text-slate-800">0</h3>
                     </div>
                     <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                        <p class="text-xs text-slate-500 font-bold uppercase mb-1">Pagos Pendientes</p>
+                        <p class="text-xs text-slate-500 font-bold uppercase mb-1">Pendientes de Pago</p>
                         <h3 id="statPending" class="text-3xl font-black text-amber-600">0</h3>
                     </div>
                     <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100 col-span-2 flex items-center gap-3">
                         <button onclick="generateReport()" class="flex-1 flex items-center justify-center space-x-2 bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all">
                             <i class="fas fa-file-pdf"></i>
-                            <span>Reporte de Ingresos</span>
+                            <span>Exportar Socios</span>
                         </button>
-                        <button onclick="showModal('modalUploadHTML')" class="p-4 bg-blue-100 text-blue-700 rounded-2xl hover:bg-blue-200 transition-all" title="Actualizar Sistema HTML">
+                        <button onclick="showModal('modalUploadHTML')" class="p-4 bg-blue-100 text-blue-700 rounded-2xl hover:bg-blue-200 transition-all" title="Subir Nuevo HTML">
                             <i class="fas fa-code"></i>
                         </button>
                     </div>
@@ -110,11 +111,11 @@
 
                 <section>
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-black text-slate-800">Gestión de Socios</h3>
+                        <h3 class="text-xl font-black text-slate-800">Directorio de Socios</h3>
                         <div class="flex gap-2">
-                            <button onclick="showModal('modalAdminPass')" class="p-2 text-slate-400 hover:text-blue-600"><i class="fas fa-shield-alt text-xl"></i></button>
+                            <button onclick="showModal('modalAdminPass')" class="p-2 text-slate-400 hover:text-blue-600"><i class="fas fa-key"></i></button>
                             <button onclick="showModal('modalAddOwner')" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg">
-                                <i class="fas fa-plus-circle mr-2"></i>Registrar Socio
+                                <i class="fas fa-plus mr-2"></i>Añadir Socio
                             </button>
                         </div>
                     </div>
@@ -123,9 +124,9 @@
 
                 <section>
                     <h3 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
-                        <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span> Validación de Comprobantes
+                        <i class="fas fa-history text-amber-500"></i> Pagos por Validar
                     </h3>
-                    <div class="bg-slate-50 rounded-3xl p-2 border border-slate-100 overflow-hidden">
+                    <div class="bg-slate-50 rounded-3xl p-4 border border-slate-100 overflow-hidden">
                         <table class="w-full text-left">
                             <tbody id="adminPaymentsList"></tbody>
                         </table>
@@ -133,48 +134,48 @@
                 </section>
             </div>
 
-            <!-- VISTA DUEÑO DE NEGOCIO -->
+            <!-- CONTENIDO SOCIO -->
             <div id="ownerView" class="hidden space-y-8">
-                <div id="statusBanner" class="p-8 rounded-[2.5rem] border-2 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm">
+                <div id="statusBanner" class="p-8 rounded-[2.5rem] border-2 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm transition-all">
                     <div class="flex items-center space-x-6 text-center md:text-left">
                         <div id="statusIcon" class="w-20 h-20 rounded-3xl flex items-center justify-center text-4xl shadow-inner"></div>
                         <div>
-                            <h3 id="statusTitle" class="text-3xl font-black tracking-tight mb-1">Cargando...</h3>
+                            <h3 id="statusTitle" class="text-3xl font-black tracking-tight mb-1">Verificando...</h3>
                             <p id="statusMsg" class="text-slate-500 font-medium"></p>
                         </div>
                     </div>
                     <div id="ownerActions" class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                         <button onclick="showModal('modalUploadPayment')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all active:scale-95">
-                            <i class="fas fa-receipt mr-2"></i>Reportar Pago
+                            <i class="fas fa-upload mr-2"></i>Subir Comprobante
                         </button>
                         <button id="ownerSystemBtn" onclick="launchSystem()" class="hidden bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all active:scale-95">
-                            <i class="fas fa-play-circle mr-2 text-blue-400"></i>Abrir Sistema Seguro
+                            <i class="fas fa-external-link-alt mr-2 text-blue-400"></i>Ingresar al Sistema
                         </button>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="bg-slate-50 p-8 rounded-[2.5rem] space-y-4 border border-slate-100">
-                        <h4 class="text-lg font-bold text-slate-800">Estado de Facturación</h4>
+                        <h4 class="text-lg font-bold text-slate-800 uppercase tracking-widest text-xs">Información de Pago</h4>
                         <div class="space-y-4">
                             <div class="flex justify-between items-end border-b border-slate-200 pb-3">
-                                <span class="text-slate-400 text-sm font-semibold uppercase tracking-tighter">Mensualidad</span>
+                                <span class="text-slate-400 text-sm font-semibold">Costo Mensual</span>
                                 <span class="font-black text-2xl text-blue-600">₡4,000</span>
                             </div>
                             <div class="flex justify-between items-end border-b border-slate-200 pb-3">
-                                <span class="text-slate-400 text-sm font-semibold uppercase tracking-tighter">SIMPE Móvil</span>
-                                <span id="simpeDisplay" class="font-bold text-lg text-slate-800"></span>
+                                <span class="text-slate-400 text-sm font-semibold">SIMPE Móvil</span>
+                                <span id="simpeDisplay" class="font-bold text-lg text-slate-800">Cargando...</span>
                             </div>
                             <div class="flex justify-between items-end">
-                                <span class="text-slate-400 text-sm font-semibold uppercase tracking-tighter">Próximo Vencimiento</span>
-                                <span id="expiryDisplay" class="font-black text-lg text-red-500">No definido</span>
+                                <span class="text-slate-400 text-sm font-semibold">Vencimiento</span>
+                                <span id="expiryDisplay" class="font-black text-lg text-red-500">---</span>
                             </div>
                         </div>
                     </div>
                     <div class="bg-blue-50/50 p-8 rounded-[2.5rem] border border-blue-100 flex flex-col justify-center">
-                        <h4 class="text-lg font-bold text-blue-800 mb-2">Acceso Blindado</h4>
-                        <p class="text-sm text-blue-600/80 leading-relaxed font-medium italic">
-                            "Para su seguridad, el link del sistema no es público. Solo puede accederse desde este panel mientras su cuenta esté activa."
+                        <h4 class="text-lg font-bold text-blue-800 mb-2">Aviso de Seguridad</h4>
+                        <p class="text-sm text-blue-600/80 leading-relaxed italic">
+                            "El acceso al sistema es personal e intransferible. Asegúrese de mantener su mensualidad al día para evitar interrupciones en el servicio."
                         </p>
                     </div>
                 </div>
@@ -182,64 +183,52 @@
         </main>
     </div>
 
-    <!-- MODAL: ADD/EDIT OWNER -->
+    <!-- MODALES -->
     <div id="modalAddOwner" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl relative">
-            <h2 class="text-2xl font-black mb-6" id="ownerModalTitle">Registrar Nuevo Socio</h2>
+            <h2 class="text-2xl font-black mb-6" id="ownerModalTitle">Registrar Socio</h2>
             <div class="space-y-4">
                 <input type="hidden" id="editOwnerId">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Nombre del Negocio</label>
-                    <input id="newOwnerName" type="text" placeholder="Ej: Cancha Los Robles" class="w-full p-4 bg-slate-50 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none border border-slate-100 font-semibold">
-                </div>
+                <input id="newOwnerName" type="text" placeholder="Nombre de la Cancha / Negocio" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Usuario</label>
-                        <input id="newOwnerUser" type="text" placeholder="user123" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Password</label>
-                        <input id="newOwnerPass" type="password" placeholder="****" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold">
-                    </div>
+                    <input id="newOwnerUser" type="text" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+                    <input id="newOwnerPass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <div class="flex gap-3 pt-6">
                     <button onclick="closeModal('modalAddOwner')" class="flex-1 bg-slate-100 py-4 rounded-2xl font-bold text-slate-500">Cancelar</button>
-                    <button onclick="saveNewOwner()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Guardar Socio</button>
+                    <button onclick="saveNewOwner()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: SUBIR HTML DEL SISTEMA -->
     <div id="modalUploadHTML" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
-            <h2 class="text-2xl font-black mb-2">Archivo Maestro</h2>
-            <p class="text-sm text-slate-500 mb-6">Sube el archivo .html que los socios activos podrán abrir.</p>
-            <div class="border-2 border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center justify-center bg-slate-50 relative">
+            <h2 class="text-2xl font-black mb-2">Actualizar Sistema</h2>
+            <p class="text-sm text-slate-500 mb-6">Sube el archivo HTML principal de la franquicia.</p>
+            <div class="border-2 border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center justify-center bg-slate-50 relative group">
                 <input type="file" id="systemHtmlFile" onchange="readSystemFile(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept=".html">
-                <i class="fas fa-file-code text-5xl text-blue-400 mb-4"></i>
-                <p id="fileNameLabel" class="text-sm font-bold text-slate-700">Arrastra el HTML aquí</p>
+                <i class="fas fa-file-code text-5xl text-blue-400 mb-4 group-hover:scale-110 transition-transform"></i>
+                <p id="fileNameLabel" class="text-sm font-bold text-slate-700 text-center">Haz clic o arrastra el archivo</p>
             </div>
             <div class="flex gap-3 mt-6">
                 <button onclick="closeModal('modalUploadHTML')" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold text-slate-500">Cerrar</button>
-                <button onclick="uploadSystemFile()" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">Actualizar Archivo</button>
+                <button onclick="uploadSystemFile()" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">Subir Archivo</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: RECIBO -->
     <div id="modalViewReceipt" class="hidden fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[70] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl">
             <img id="receiptImg" src="" class="w-full h-[30rem] object-contain bg-slate-50 p-6">
             <div class="p-8 flex gap-4 bg-white border-t border-slate-100">
-                <button id="btnReject" class="flex-1 bg-red-100 text-red-600 py-4 rounded-2xl font-bold">Rechazar</button>
-                <button id="btnApprove" class="flex-1 bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg">Validar Pago</button>
+                <button id="btnReject" class="flex-1 bg-red-100 text-red-600 py-4 rounded-2xl font-bold hover:bg-red-200">Rechazar</button>
+                <button id="btnApprove" class="flex-1 bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-emerald-700">Validar Pago</button>
             </div>
-            <button onclick="closeModal('modalViewReceipt')" class="w-full py-4 text-slate-400 text-sm font-bold uppercase tracking-widest">Cerrar Visor</button>
+            <button onclick="closeModal('modalViewReceipt')" class="w-full py-4 text-slate-400 text-sm font-bold uppercase tracking-widest hover:text-slate-600">Cerrar Visor</button>
         </div>
     </div>
 
-    <!-- MODAL: REPORTAR PAGO -->
     <div id="modalUploadPayment" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
             <h2 class="text-2xl font-black mb-4">Reportar Mensualidad</h2>
@@ -248,24 +237,32 @@
                     <input type="file" id="receiptUpload" onchange="previewReceipt(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
                     <div id="receiptPlaceholder" class="text-center">
                         <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-3"></i>
-                        <p class="text-sm font-bold text-slate-700">Subir Comprobante SIMPE</p>
+                        <p class="text-sm font-bold text-slate-700">Subir Captura de SIMPE</p>
                     </div>
-                    <img id="receiptPreview" src="" class="hidden w-full h-40 object-contain rounded-2xl">
+                    <img id="receiptPreview" src="" class="hidden w-full h-44 object-contain rounded-2xl shadow-sm">
                 </div>
-                <button onclick="submitPayment()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black shadow-xl transition-all hover:bg-blue-700">ENVIAR COMPROBANTE (₡4,000)</button>
-                <button onclick="closeModal('modalUploadPayment')" class="w-full py-2 text-slate-400 font-bold uppercase text-xs tracking-widest">Cancelar</button>
+                <button onclick="submitPayment()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black shadow-xl transition-all hover:bg-blue-700 active:scale-95">ENVIAR COMPROBANTE</button>
+                <button onclick="closeModal('modalUploadPayment')" class="w-full py-2 text-slate-400 font-bold uppercase text-[10px] tracking-widest">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: PASS ADMIN -->
     <div id="modalAdminPass" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
-            <h2 class="text-2xl font-black mb-4">Contraseña Maestra</h2>
-            <input id="admin_new_pass" type="password" class="w-full p-4 bg-slate-50 rounded-xl mb-6 border border-slate-100 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nueva Contraseña de Administrador">
-            <div class="flex gap-3">
-                <button onclick="closeModal('modalAdminPass')" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold">Cerrar</button>
-                <button onclick="updateAdminPass()" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">Actualizar</button>
+            <h2 class="text-2xl font-black mb-6">Configuración Maestra</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Clave Administrador</label>
+                    <input id="admin_new_pass" type="password" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nueva Clave Admin">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Número SIMPE de Cobro</label>
+                    <input id="admin_new_simpe" type="text" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 8888 8888">
+                </div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeModal('modalAdminPass')" class="flex-1 py-4 bg-slate-100 rounded-2xl font-bold text-slate-500">Cerrar</button>
+                <button onclick="updateMasterConfig()" class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">Actualizar Todo</button>
             </div>
         </div>
     </div>
@@ -275,7 +272,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Credenciales oficiales de franquicia-fut
+        // CONFIGURACIÓN OFICIAL
         const firebaseConfig = {
             apiKey: "AIzaSyAK5U5g_dKcjb0jmWzf4o2_xV9fULRuNLw",
             authDomain: "franquicia-fut.firebaseapp.com",
@@ -289,8 +286,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = "franquicia-fut"; // Consistente con las reglas de seguridad
+        const appId = "franquicia-fut"; 
 
+        let userAuthenticated = false;
         let currentUser = null;
         let currentOwnerData = null;
         let allOwners = [];
@@ -299,23 +297,36 @@
         let tempReceipt = null;
         let tempSystemHtml = "";
 
-        // Autenticación anónima necesaria para las reglas de seguridad Firestore
-        signInAnonymously(auth).catch(e => console.error("Error Auth:", e));
+        // Inicializar Auth de forma robusta
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+                console.log("Sesión anónima iniciada.");
+            } catch (e) {
+                console.error("Error al iniciar sesión anónima:", e);
+            }
+        };
+        initAuth();
 
         onAuthStateChanged(auth, (user) => {
-            if (user) syncData();
+            if (user) {
+                userAuthenticated = true;
+                syncData();
+            }
         });
 
         function syncData() {
-            // Escuchar configuración maestra
+            if (!userAuthenticated) return;
+
+            // Configuración Global
             onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), (s) => {
                 if(s.exists()) {
                     configData = s.data();
-                    document.getElementById('simpeDisplay').innerText = configData.simpe || '7228 4602';
+                    document.getElementById('simpeDisplay').innerText = configData.simpe || 'No configurado';
                 }
             }, (e) => console.error("Error Sync Config:", e));
 
-            // Escuchar socios
+            // Directorio de Socios
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'business_owners'), (s) => {
                 allOwners = s.docs.map(d => ({id: d.id, ...d.data()}));
                 checkExpirations();
@@ -323,7 +334,7 @@
                 else if(currentUser === 'owner') updateCurrentOwnerData();
             }, (e) => console.error("Error Sync Owners:", e));
 
-            // Escuchar pagos
+            // Pagos
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), (s) => {
                 allPayments = s.docs.map(d => ({id: d.id, ...d.data()}));
                 if(currentUser === 'admin') renderAdmin();
@@ -331,20 +342,23 @@
         }
 
         async function checkExpirations() {
+            if (!userAuthenticated) return;
             const today = new Date();
             for(let owner of allOwners) {
                 if(owner.status === 'active' && owner.expiryDate) {
-                    const expiry = new Date(owner.expiryDate);
-                    if(today > expiry) {
-                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', owner.id), { status: 'inactive' });
+                    if(today > new Date(owner.expiryDate)) {
+                        try {
+                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', owner.id), { status: 'inactive' });
+                        } catch(e) { console.error("Error expirando socio:", e); }
                     }
                 }
             }
         }
 
         window.handleLogin = () => {
-            const u = document.getElementById('loginUser').value;
-            const p = document.getElementById('loginPass').value;
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+            
             if(u === 'admin' && p === (configData.adminPass || 'master123')) {
                 currentUser = 'admin';
                 enterApp();
@@ -355,7 +369,7 @@
                     currentUser = 'owner';
                     enterApp();
                 } else {
-                    alert("Acceso denegado. Revise sus credenciales.");
+                    alert("Usuario o Contraseña incorrectos.");
                 }
             }
         };
@@ -367,7 +381,7 @@
                 document.getElementById('adminView').classList.remove('hidden');
                 document.getElementById('ownerView').classList.add('hidden');
                 document.getElementById('userNameDisplay').innerText = "Super Administrador";
-                document.getElementById('userTypeBadge').innerText = "Master Control Unit";
+                document.getElementById('userTypeBadge').innerText = "Acceso Total";
                 renderAdmin();
             } else {
                 document.getElementById('adminView').classList.add('hidden');
@@ -384,25 +398,8 @@
             }
         }
 
-        window.launchSystem = () => {
-            if(currentOwnerData.status !== 'active') return alert("Tu acceso ha expirado.");
-            if(!configData.systemHtml) return alert("El Administrador aún no ha cargado el sistema.");
-
-            const container = document.getElementById('systemIframeContainer');
-            const iframe = document.getElementById('appSandbox');
-            const blob = new Blob([configData.systemHtml], { type: 'text/html' });
-            iframe.src = URL.createObjectURL(blob);
-            container.style.display = 'block';
-        };
-
-        window.closeSystem = () => {
-            document.getElementById('appSandbox').src = "about:blank";
-            document.getElementById('systemIframeContainer').style.display = 'none';
-        };
-
         window.logout = () => location.reload();
 
-        // FUNCIONES ADMIN
         function renderAdmin() {
             document.getElementById('statOwners').innerText = allOwners.length;
             const pending = allPayments.filter(p => p.status === 'pending');
@@ -412,20 +409,20 @@
             oList.innerHTML = '';
             allOwners.forEach(o => {
                 const card = document.createElement('div');
-                card.className = "p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm flex flex-col justify-between hover:shadow-md transition-all";
+                card.className = "p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-md transition-all fade-in";
                 card.innerHTML = `
-                    <div class="mb-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-black text-slate-800 leading-tight">${o.name}</h4>
-                            <span class="text-[9px] px-2 py-1 rounded-lg font-black uppercase ${o.status === 'active' ? 'status-active' : 'status-inactive'}">
-                                ${o.status === 'active' ? 'Acceso OK' : 'Bloqueado'}
-                            </span>
-                        </div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Expira: ${o.expiryDate ? new Date(o.expiryDate).toLocaleDateString() : 'N/A'}</p>
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-black text-slate-800 leading-tight">${o.name}</h4>
+                        <span class="text-[9px] px-2 py-1 rounded-lg font-black uppercase ${o.status === 'active' ? 'status-active' : 'status-inactive'}">
+                            ${o.status === 'active' ? 'ACTIVO' : 'EXPIRADO'}
+                        </span>
                     </div>
-                    <div class="flex gap-2 border-t border-slate-50 pt-4">
-                        <button onclick="editOwner('${o.id}')" class="flex-1 bg-slate-50 text-slate-500 py-2 rounded-xl text-xs font-bold hover:bg-blue-50 hover:text-blue-600 transition-colors">Editar</button>
-                        <button onclick="deleteOwner('${o.id}')" class="bg-red-50 text-red-500 p-2 rounded-xl text-xs hover:bg-red-500 hover:text-white transition-colors"><i class="fas fa-trash"></i></button>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4">
+                        Usuario: ${o.user} | Vence: ${o.expiryDate ? new Date(o.expiryDate).toLocaleDateString() : '---'}
+                    </div>
+                    <div class="flex gap-2 pt-4 border-t border-slate-50">
+                        <button onclick="editOwner('${o.id}')" class="flex-1 py-2 rounded-xl text-xs font-bold bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-colors">Editar</button>
+                        <button onclick="deleteOwner('${o.id}')" class="p-2 rounded-xl text-xs bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
                 oList.appendChild(card);
@@ -433,17 +430,18 @@
 
             const pList = document.getElementById('adminPaymentsList');
             pList.innerHTML = '';
+            if(pending.length === 0) pList.innerHTML = '<tr><td class="text-center py-8 text-slate-400 font-medium italic">No hay pagos pendientes</td></tr>';
             pending.forEach(p => {
                 const owner = allOwners.find(o => o.id === p.ownerId);
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="p-6">
-                        <div class="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-100">
+                    <td class="pb-3">
+                        <div class="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
                             <div>
-                                <p class="font-black text-slate-800">${owner?.name || 'Usuario'}</p>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Monto Recibido: ₡4,000</p>
+                                <p class="font-black text-slate-800">${owner?.name || 'Desconocido'}</p>
+                                <p class="text-[9px] font-bold text-blue-500 uppercase tracking-widest">Pago Mensual: ₡4,000</p>
                             </div>
-                            <button onclick="reviewReceipt('${p.id}', '${p.receiptImg}')" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg">Revisar Pago</button>
+                            <button onclick="reviewReceipt('${p.id}', '${p.receiptImg}')" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-800 shadow-lg">Ver Comprobante</button>
                         </div>
                     </td>
                 `;
@@ -451,64 +449,93 @@
             });
         }
 
-        window.readSystemFile = (input) => {
-            const f = input.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                tempSystemHtml = e.target.result;
-                document.getElementById('fileNameLabel').innerText = f.name;
-            };
-            reader.readAsText(f);
-        };
-
-        window.uploadSystemFile = async () => {
-            if(!tempSystemHtml) return alert("Selecciona un archivo.");
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), { systemHtml: tempSystemHtml }, { merge: true });
-            alert("Sistema Maestro actualizado.");
-            closeModal('modalUploadHTML');
-        };
-
         window.saveNewOwner = async () => {
-            const name = document.getElementById('newOwnerName').value;
-            const user = document.getElementById('newOwnerUser').value;
-            const pass = document.getElementById('newOwnerPass').value;
+            if (!userAuthenticated) return alert("Error: No autenticado con Firebase.");
+            const name = document.getElementById('newOwnerName').value.trim();
+            const user = document.getElementById('newOwnerUser').value.trim();
+            const pass = document.getElementById('newOwnerPass').value.trim();
             const id = document.getElementById('editOwnerId').value;
-            if(!name || !user || !pass) return alert("Completa todos los campos.");
-
-            const data = { name, user, pass, status: id ? allOwners.find(o=>o.id===id).status : 'inactive' };
-            if(id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id), data);
-            else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'business_owners'), data);
             
-            closeModal('modalAddOwner');
-            document.getElementById('editOwnerId').value = '';
+            if(!name || !user || !pass) return alert("Por favor complete todos los campos.");
+
+            try {
+                const payload = { name, user, pass, status: id ? allOwners.find(o=>o.id===id).status : 'inactive' };
+                if(id) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id), payload);
+                } else {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'business_owners'), payload);
+                }
+                alert("Guardado correctamente.");
+                closeModal('modalAddOwner');
+                document.getElementById('editOwnerId').value = "";
+            } catch (e) {
+                console.error("Error al guardar socio:", e);
+                alert("Error al guardar: Verifique los permisos de Firestore.");
+            }
         };
 
         window.reviewReceipt = (pId, img) => {
             document.getElementById('receiptImg').src = img;
             showModal('modalViewReceipt');
-            document.getElementById('btnApprove').onclick = () => processPayment(pId, 'approve');
-            document.getElementById('btnReject').onclick = () => processPayment(pId, 'reject');
+            document.getElementById('btnApprove').onclick = () => validatePayment(pId, true);
+            document.getElementById('btnReject').onclick = () => validatePayment(pId, false);
         };
 
-        async function processPayment(pId, action) {
-            const p = allPayments.find(pay => pay.id === pId);
-            if(action === 'approve') {
-                const nextExp = new Date();
-                nextExp.setDate(nextExp.getDate() + 30);
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', p.ownerId), { 
-                    status: 'active',
-                    expiryDate: nextExp.toISOString()
-                });
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', pId), { status: 'approved' });
-                alert("Socio activado.");
-            } else {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', pId), { status: 'rejected' });
-                alert("Pago denegado.");
-            }
+        async function validatePayment(pId, isOk) {
+            if (!userAuthenticated) return;
+            const pay = allPayments.find(x => x.id === pId);
+            try {
+                if(isOk) {
+                    const exp = new Date();
+                    exp.setDate(exp.getDate() + 30);
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', pay.ownerId), { 
+                        status: 'active', 
+                        expiryDate: exp.toISOString() 
+                    });
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', pId), { status: 'approved' });
+                    alert("Pago validado.");
+                } else {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', pId), { status: 'rejected' });
+                    alert("Pago rechazado.");
+                }
+            } catch (e) { console.error("Error validando pago:", e); }
             closeModal('modalViewReceipt');
         }
 
-        // FUNCIONES SOCIO
+        window.readSystemFile = (input) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                tempSystemHtml = e.target.result;
+                document.getElementById('fileNameLabel').innerText = input.files[0].name;
+            };
+            reader.readAsText(input.files[0]);
+        };
+
+        window.uploadSystemFile = async () => {
+            if(!tempSystemHtml) return alert("Seleccione un archivo HTML.");
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), { systemHtml: tempSystemHtml }, { merge: true });
+                alert("Sistema Maestro actualizado.");
+                closeModal('modalUploadHTML');
+            } catch (e) { console.error("Error subiendo HTML:", e); }
+        };
+
+        window.updateMasterConfig = async () => {
+            const pass = document.getElementById('admin_new_pass').value.trim();
+            const simpe = document.getElementById('admin_new_simpe').value.trim();
+            const up = {};
+            if(pass) up.adminPass = pass;
+            if(simpe) up.simpe = simpe;
+            
+            if(Object.keys(up).length) {
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), up, { merge: true });
+                    alert("Configuración actualizada.");
+                    closeModal('modalAdminPass');
+                } catch(e) { console.error("Error config:", e); }
+            }
+        };
+
         function renderOwner() {
             document.getElementById('userNameDisplay').innerText = currentOwnerData.name;
             document.getElementById('expiryDisplay').innerText = currentOwnerData.expiryDate ? new Date(currentOwnerData.expiryDate).toLocaleDateString() : 'Pendiente';
@@ -522,54 +549,74 @@
             if(currentOwnerData.status === 'active') {
                 banner.className = "p-8 rounded-[2.5rem] border-2 status-active border-emerald-100 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm";
                 icon.className = "w-20 h-20 rounded-3xl flex items-center justify-center text-4xl bg-emerald-200 text-emerald-700 shadow-inner";
-                icon.innerHTML = '<i class="fas fa-check-shield"></i>';
-                title.innerText = "Acceso Autorizado";
-                msg.innerText = "Su mensualidad está al día.";
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                title.innerText = "Acceso Activo";
+                msg.innerText = "Bienvenido. Puede ingresar al sistema ahora.";
                 sysBtn.classList.remove('hidden');
             } else {
                 banner.className = "p-8 rounded-[2.5rem] border-2 status-inactive border-red-100 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm";
                 icon.className = "w-20 h-20 rounded-3xl flex items-center justify-center text-4xl bg-red-200 text-red-700 shadow-inner";
-                icon.innerHTML = '<i class="fas fa-lock text-red-500"></i>';
-                title.innerText = "Acceso Denegado";
-                msg.innerText = "Reporte su pago de ₡4,000 para habilitar el servicio.";
+                icon.innerHTML = '<i class="fas fa-lock"></i>';
+                title.innerText = "Acceso Suspendido";
+                msg.innerText = "Reporte su pago para desbloquear el sistema.";
                 sysBtn.classList.add('hidden');
             }
         }
 
+        window.launchSystem = () => {
+            if(currentOwnerData.status !== 'active') return;
+            if(!configData.systemHtml) return alert("El sistema aún no ha sido cargado.");
+            
+            const container = document.getElementById('systemIframeContainer');
+            const iframe = document.getElementById('appSandbox');
+            const blob = new Blob([configData.systemHtml], { type: 'text/html' });
+            iframe.src = URL.createObjectURL(blob);
+            container.style.display = 'block';
+        };
+
+        window.closeSystem = () => {
+            document.getElementById('appSandbox').src = "about:blank";
+            document.getElementById('systemIframeContainer').style.display = 'none';
+        };
+
         window.previewReceipt = (input) => {
-            const f = input.files[0];
-            const r = new FileReader();
-            r.onload = (e) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
                 tempReceipt = e.target.result;
                 document.getElementById('receiptPlaceholder').classList.add('hidden');
                 document.getElementById('receiptPreview').src = tempReceipt;
                 document.getElementById('receiptPreview').classList.remove('hidden');
             };
-            r.readAsDataURL(f);
+            reader.readAsDataURL(input.files[0]);
         };
 
         window.submitPayment = async () => {
-            if(!tempReceipt) return alert("Adjunte el comprobante.");
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), {
-                ownerId: currentOwnerData.id,
-                status: 'pending',
-                receiptImg: tempReceipt,
-                timestamp: new Date().toISOString()
-            });
-            alert("Comprobante enviado.");
-            closeModal('modalUploadPayment');
+            if(!tempReceipt) return alert("Por favor suba la captura.");
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), {
+                    ownerId: currentOwnerData.id,
+                    status: 'pending',
+                    receiptImg: tempReceipt,
+                    date: new Date().toISOString()
+                });
+                alert("Comprobante enviado.");
+                closeModal('modalUploadPayment');
+            } catch(e) { console.error("Error pago:", e); }
         };
 
         window.generateReport = () => {
             const { jsPDF } = window.jspdf;
-            const d = new jsPDF();
-            d.setFontSize(22); d.text("SaaS Master - Reporte", 14, 25);
-            const data = allOwners.map(o => [o.name, o.user, o.status, o.expiryDate ? new Date(o.expiryDate).toLocaleDateString() : 'N/A']);
-            d.autoTable({ startY: 40, head: [['Negocio', 'Usuario', 'Estado', 'Vence']], body: data, theme: 'striped' });
-            d.save("Reporte_Socios.pdf");
+            const docPdf = new jsPDF();
+            docPdf.text("Reporte Maestro de Socios", 14, 20);
+            const tableData = allOwners.map(o => [o.name, o.user, o.status.toUpperCase(), o.expiryDate ? new Date(o.expiryDate).toLocaleDateString() : 'N/A']);
+            docPdf.autoTable({
+                startY: 30,
+                head: [['Negocio', 'Usuario', 'Estado', 'Vence']],
+                body: tableData
+            });
+            docPdf.save("Reporte_Socios.pdf");
         };
 
-        // UTILS UI
         window.showModal = (id) => document.getElementById(id).classList.remove('hidden');
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
         window.editOwner = (id) => {
@@ -582,13 +629,11 @@
             showModal('modalAddOwner');
         };
         window.deleteOwner = async (id) => {
-            if(confirm("¿Eliminar socio?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id));
-        };
-        window.updateAdminPass = async () => {
-            const n = document.getElementById('admin_new_pass').value;
-            if(n) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sys_config', 'main'), { adminPass: n }, { merge: true });
-            alert("Contraseña actualizada.");
-            closeModal('modalAdminPass');
+            if(confirm("¿Seguro que desea eliminar a este socio?")) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id));
+                } catch(e) { console.error("Error delete:", e); }
+            }
         };
 
     </script>
