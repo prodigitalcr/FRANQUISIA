@@ -37,11 +37,11 @@
             <span class="font-bold flex items-center gap-2">
                 <i class="fas fa-shield-alt text-blue-400"></i> Acceso Seguro Habilitado
             </span>
-            <button onclick="closeSystem()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-sm transition-colors">
-                <i class="fas fa-times mr-2"></i>Cerrar Sistema
+            <button onclick="showModal('modalVerifyClose')" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center">
+                <i class="fas fa-lock mr-2"></i>Volver al administrador
             </button>
         </div>
-        <iframe id="appSandbox" class="w-full h-[calc(100%-4rem)] border-none"></iframe>
+        <iframe id="appSandbox" class="w-full h-[calc(100%-4rem)] border-none bg-white"></iframe>
     </div>
 
     <!-- PANTALLA DE LOGIN -->
@@ -89,31 +89,38 @@
             
             <!-- CONTENIDO ADMINISTRADOR -->
             <div id="adminView" class="hidden space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col justify-center relative">
                         <p class="text-xs text-slate-500 font-bold uppercase mb-1">Socios Totales</p>
                         <h3 id="statOwners" class="text-3xl font-black text-slate-800">0</h3>
                     </div>
-                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col justify-center">
                         <p class="text-xs text-slate-500 font-bold uppercase mb-1">Pendientes de Pago</p>
                         <h3 id="statPending" class="text-3xl font-black text-amber-600">0</h3>
                     </div>
-                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100 col-span-2 flex items-center gap-3">
-                        <button onclick="generateReport()" class="flex-1 flex items-center justify-center space-x-2 bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all">
-                            <i class="fas fa-file-pdf"></i>
-                            <span>Exportar Socios</span>
-                        </button>
-                        <button onclick="showModal('modalUploadHTML')" class="p-4 bg-blue-100 text-blue-700 rounded-2xl hover:bg-blue-200 transition-all" title="Subir Nuevo HTML">
-                            <i class="fas fa-code"></i>
-                        </button>
+                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col justify-center">
+                        <p class="text-xs text-slate-500 font-bold uppercase mb-1">Ingresos del Mes</p>
+                        <h3 id="statIncome" class="text-3xl font-black text-emerald-600">₡0</h3>
                     </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="generateReport()" class="flex-1 flex items-center justify-center space-x-2 bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Exportar Socios a PDF</span>
+                    </button>
+                    <button onclick="showModal('modalUploadHTML')" class="flex items-center justify-center space-x-2 bg-blue-100 text-blue-700 py-4 rounded-2xl font-bold hover:bg-blue-200 transition-all" title="Subir Nuevo HTML Principal">
+                        <i class="fas fa-globe"></i>
+                        <span>Actualizar HTML Maestro</span>
+                    </button>
                 </div>
 
                 <section>
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-black text-slate-800">Directorio de Socios</h3>
                         <div class="flex gap-2">
-                            <button onclick="showModal('modalAdminPass')" class="p-2 text-slate-400 hover:text-blue-600"><i class="fas fa-key"></i></button>
+                            <button onclick="showModal('modalAdminPass')" class="p-2 text-slate-400 hover:text-blue-600" title="Configuraciones"><i class="fas fa-key text-xl"></i></button>
                             <button onclick="showModal('modalAddOwner')" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg">
                                 <i class="fas fa-plus mr-2"></i>Añadir Socio
                             </button>
@@ -145,7 +152,7 @@
                         </div>
                     </div>
                     <div id="ownerActions" class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                        <button onclick="showModal('modalUploadPayment')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all active:scale-95">
+                        <button id="btnUploadPayment" onclick="showModal('modalUploadPayment')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all active:scale-95 hidden">
                             <i class="fas fa-upload mr-2"></i>Subir Comprobante
                         </button>
                         <button id="ownerSystemBtn" onclick="launchSystem()" class="hidden bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all active:scale-95">
@@ -163,7 +170,7 @@
                                 <span class="font-black text-2xl text-blue-600">₡4,000</span>
                             </div>
                             <div class="flex justify-between items-end border-b border-slate-200 pb-3">
-                                <span class="text-slate-400 text-sm font-semibold">SIMPE Móvil</span>
+                                <span class="text-slate-400 text-sm font-semibold">SINPE MÓVIL</span>
                                 <span id="simpeDisplay" class="font-bold text-lg text-slate-800">Cargando...</span>
                             </div>
                             <div class="flex justify-between items-end">
@@ -183,17 +190,67 @@
         </main>
     </div>
 
-    <!-- MODALES -->
+    <!-- MODALES GLOBALES -->
+
+    <!-- Modal: Cerrar Sistema Seguro con Contraseña -->
+    <div id="modalVerifyClose" class="hidden fixed inset-0 bg-slate-900/95 backdrop-blur-sm z-[2000] flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl text-center">
+            <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h3 class="text-2xl font-black mb-2">Confirmar Identidad</h3>
+            <p class="text-sm text-slate-500 mb-6">Ingrese la contraseña de su cuenta registrada en Master Control para salir.</p>
+            <input type="password" id="verifyClosePass" class="w-full p-4 bg-slate-50 rounded-xl mb-6 border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Su contraseña">
+            <div class="flex gap-3">
+                <button onclick="closeModal('modalVerifyClose')" class="flex-1 p-4 bg-slate-100 text-slate-600 rounded-2xl font-bold">Cancelar</button>
+                <button onclick="verifyAndCloseSystem()" class="flex-1 p-4 bg-red-600 text-white rounded-2xl font-bold shadow-lg">Salir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Visor de Imagen Fullscreen -->
+    <div id="modalFullscreenImg" class="hidden fixed inset-0 bg-black/95 z-[3000] flex items-center justify-center p-4 fade-in cursor-zoom-out" onclick="closeModal('modalFullscreenImg')">
+        <img id="fullscreenImgSrc" src="" class="max-w-full max-h-full object-contain rounded-lg">
+        <div class="absolute bottom-6 text-white text-sm bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">Clic en cualquier parte para cerrar</div>
+    </div>
+
+    <!-- Modal: Agregar/Editar Socio -->
     <div id="modalAddOwner" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl relative">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-black mb-6" id="ownerModalTitle">Registrar Socio</h2>
             <div class="space-y-4">
                 <input type="hidden" id="editOwnerId">
-                <input id="newOwnerName" type="text" placeholder="Nombre de la Cancha / Negocio" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
-                <div class="grid grid-cols-2 gap-3">
-                    <input id="newOwnerUser" type="text" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
-                    <input id="newOwnerPass" type="password" placeholder="Contraseña" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+                
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Nombre de Negocio</label>
+                    <input id="newOwnerName" type="text" placeholder="Ej: Cancha Los Robles" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Usuario</label>
+                        <input id="newOwnerUser" type="text" placeholder="Usuario" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Contraseña</label>
+                        <input id="newOwnerPass" type="password" placeholder="Clave" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Número de WhatsApp (Con código país si aplica)</label>
+                    <input id="newOwnerWhatsApp" type="text" placeholder="Ej: 50688888888" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+
+                <!-- Visor de comprobante al editar -->
+                <div id="receiptInEdit" class="hidden mt-4">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 flex items-center gap-1"><i class="fas fa-receipt text-blue-500"></i> Último Comprobante Subido</label>
+                    <div class="p-2 bg-slate-50 border border-slate-100 rounded-xl mt-1 cursor-zoom-in" onclick="openFullscreen(document.getElementById('receiptInEditImg').src)">
+                        <img id="receiptInEditImg" src="" class="w-full h-32 object-cover rounded-lg shadow-sm" title="Haz clic para ver en grande">
+                        <p class="text-center text-[10px] text-slate-400 mt-2 font-bold"><i class="fas fa-search-plus"></i> Tocar para agrandar</p>
+                    </div>
+                </div>
+
                 <div class="flex gap-3 pt-6">
                     <button onclick="closeModal('modalAddOwner')" class="flex-1 bg-slate-100 py-4 rounded-2xl font-bold text-slate-500">Cancelar</button>
                     <button onclick="saveNewOwner()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Guardar</button>
@@ -202,10 +259,11 @@
         </div>
     </div>
 
+    <!-- Modal: Subir HTML Global -->
     <div id="modalUploadHTML" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
             <h2 class="text-2xl font-black mb-2">Actualizar Sistema</h2>
-            <p class="text-sm text-slate-500 mb-6">Sube el archivo HTML principal de la franquicia.</p>
+            <p class="text-sm text-slate-500 mb-6">Sube el archivo HTML principal que cargarán los socios por defecto.</p>
             <div class="border-2 border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center justify-center bg-slate-50 relative group">
                 <input type="file" id="systemHtmlFile" onchange="readSystemFile(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept=".html">
                 <i class="fas fa-file-code text-5xl text-blue-400 mb-4 group-hover:scale-110 transition-transform"></i>
@@ -218,9 +276,34 @@
         </div>
     </div>
 
+    <!-- Modal: Subir HTML Específico por Usuario -->
+    <div id="modalUserHTML" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
+            <h2 class="text-2xl font-black mb-2">HTML Personalizado</h2>
+            <p id="userHtmlStatus" class="text-sm text-slate-500 mb-6 font-bold"></p>
+            <input type="hidden" id="targetUserHtmlId">
+            <div class="border-2 border-dashed border-purple-200 rounded-3xl p-10 flex flex-col items-center justify-center bg-purple-50 relative group">
+                <input type="file" id="userHtmlInput" onchange="readUserHtmlFile(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept=".html">
+                <i class="fas fa-user-cog text-5xl text-purple-400 mb-4 group-hover:scale-110 transition-transform"></i>
+                <p id="userFileNameLabel" class="text-sm font-bold text-purple-700 text-center">Subir HTML Exclusivo</p>
+            </div>
+            <div class="flex flex-col gap-3 mt-6">
+                <button onclick="saveUserHtml()" class="w-full py-4 bg-purple-600 text-white rounded-2xl font-bold shadow-lg">Guardar HTML del Socio</button>
+                <div class="flex gap-3">
+                    <button onclick="closeModal('modalUserHTML')" class="flex-1 py-3 bg-slate-100 rounded-xl font-bold text-slate-500">Cancelar</button>
+                    <button onclick="clearUserHtml()" class="flex-1 py-3 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100">Borrar y usar Global</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Visor de Recibo para Validar -->
     <div id="modalViewReceipt" class="hidden fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[70] flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl">
-            <img id="receiptImg" src="" class="w-full h-[30rem] object-contain bg-slate-50 p-6">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl flex flex-col">
+            <div class="relative bg-slate-50 p-6 flex-grow flex items-center justify-center cursor-zoom-in" onclick="openFullscreen(document.getElementById('receiptImg').src)">
+                <img id="receiptImg" src="" class="max-h-[30rem] w-auto object-contain shadow-md rounded-xl">
+                <div class="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full text-xs font-bold backdrop-blur-md"><i class="fas fa-search-plus"></i> Ampliar</div>
+            </div>
             <div class="p-8 flex gap-4 bg-white border-t border-slate-100">
                 <button id="btnReject" class="flex-1 bg-red-100 text-red-600 py-4 rounded-2xl font-bold hover:bg-red-200">Rechazar</button>
                 <button id="btnApprove" class="flex-1 bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-emerald-700">Validar Pago</button>
@@ -229,6 +312,7 @@
         </div>
     </div>
 
+    <!-- Modal: Reportar Pago (Socio) -->
     <div id="modalUploadPayment" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
             <h2 class="text-2xl font-black mb-4">Reportar Mensualidad</h2>
@@ -237,7 +321,7 @@
                     <input type="file" id="receiptUpload" onchange="previewReceipt(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
                     <div id="receiptPlaceholder" class="text-center">
                         <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-3"></i>
-                        <p class="text-sm font-bold text-slate-700">Subir Captura de SIMPE</p>
+                        <p class="text-sm font-bold text-slate-700">Subir Captura de SINPE MÓVIL</p>
                     </div>
                     <img id="receiptPreview" src="" class="hidden w-full h-44 object-contain rounded-2xl shadow-sm">
                 </div>
@@ -247,6 +331,7 @@
         </div>
     </div>
 
+    <!-- Modal: Configuración Admin (Clave y SIMPE) -->
     <div id="modalAdminPass" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl">
             <h2 class="text-2xl font-black mb-6">Configuración Maestra</h2>
@@ -256,7 +341,7 @@
                     <input id="admin_new_pass" type="password" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nueva Clave Admin">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Número SIMPE de Cobro</label>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Número SINPE MÓVIL de Cobro</label>
                     <input id="admin_new_simpe" type="text" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 8888 8888">
                 </div>
             </div>
@@ -296,14 +381,13 @@
         let configData = {};
         let tempReceipt = null;
         let tempSystemHtml = "";
+        let tempUserHtml = "";
 
-        // Inicializar Auth de forma robusta
         const initAuth = async () => {
             try {
                 await signInAnonymously(auth);
-                console.log("Sesión anónima iniciada.");
             } catch (e) {
-                console.error("Error al iniciar sesión anónima:", e);
+                console.error("Error Auth:", e);
             }
         };
         initAuth();
@@ -324,7 +408,7 @@
                     configData = s.data();
                     document.getElementById('simpeDisplay').innerText = configData.simpe || 'No configurado';
                 }
-            }, (e) => console.error("Error Sync Config:", e));
+            }, (e) => console.error("Error Config:", e));
 
             // Directorio de Socios
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'business_owners'), (s) => {
@@ -332,13 +416,14 @@
                 checkExpirations();
                 if(currentUser === 'admin') renderAdmin();
                 else if(currentUser === 'owner') updateCurrentOwnerData();
-            }, (e) => console.error("Error Sync Owners:", e));
+            }, (e) => console.error("Error Owners:", e));
 
             // Pagos
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), (s) => {
                 allPayments = s.docs.map(d => ({id: d.id, ...d.data()}));
                 if(currentUser === 'admin') renderAdmin();
-            }, (e) => console.error("Error Sync Payments:", e));
+                else if(currentUser === 'owner') renderOwner(); // Volver a renderizar para ocultar boton si hay pendiente
+            }, (e) => console.error("Error Payments:", e));
         }
 
         async function checkExpirations() {
@@ -377,6 +462,8 @@
         function enterApp() {
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('mainPanel').classList.remove('hidden');
+            document.getElementById('loginPass').value = ''; // limpiar
+            
             if(currentUser === 'admin') {
                 document.getElementById('adminView').classList.remove('hidden');
                 document.getElementById('ownerView').classList.add('hidden');
@@ -404,30 +491,69 @@
             document.getElementById('statOwners').innerText = allOwners.length;
             const pending = allPayments.filter(p => p.status === 'pending');
             document.getElementById('statPending').innerText = pending.length;
+            
+            // Ingresos mensuales (Socios activos * 4000)
+            const activeOwners = allOwners.filter(o => o.status === 'active').length;
+            const totalIncome = activeOwners * 4000;
+            document.getElementById('statIncome').innerText = `₡${totalIncome.toLocaleString('es-CR')}`;
 
+            // Lista de Socios
             const oList = document.getElementById('ownersList');
             oList.innerHTML = '';
+            
             allOwners.forEach(o => {
+                // Verificar si vence en menos de 24 horas
+                let isExpiringSoon = false;
+                if(o.status === 'active' && o.expiryDate) {
+                    const expDate = new Date(o.expiryDate);
+                    const now = new Date();
+                    const diffHours = (expDate - now) / (1000 * 60 * 60);
+                    if(diffHours > 0 && diffHours <= 24) isExpiringSoon = true;
+                }
+
+                const waNumber = o.whatsapp ? o.whatsapp.replace(/\D/g,'') : '';
+                const waConfirmUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola ${o.name}, su suscripción ha sido confirmada. Es válida hasta ${new Date(o.expiryDate).toLocaleDateString()}. Gracias por usar la plataforma.`)}`;
+                const waRemindUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola ${o.name}, le recordamos que en menos de 24 horas vence su suscripción mensual. Le animamos a realizar el pago para continuar usando la plataforma sin interrupciones.`)}`;
+
                 const card = document.createElement('div');
-                card.className = "p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-md transition-all fade-in";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <h4 class="font-black text-slate-800 leading-tight">${o.name}</h4>
-                        <span class="text-[9px] px-2 py-1 rounded-lg font-black uppercase ${o.status === 'active' ? 'status-active' : 'status-inactive'}">
-                            ${o.status === 'active' ? 'ACTIVO' : 'EXPIRADO'}
-                        </span>
+                card.className = `relative p-6 bg-white border ${isExpiringSoon ? 'border-amber-400 shadow-amber-100' : 'border-slate-100'} rounded-[2rem] shadow-sm hover:shadow-md transition-all fade-in flex flex-col justify-between`;
+                
+                let htmlCard = `
+                    ${isExpiringSoon ? `<div class="absolute -top-3 -right-3 bg-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg animate-pulse"><i class="fas fa-exclamation-triangle"></i> ¡Vence en 24h!</div>` : ''}
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-black text-slate-800 leading-tight">${o.name}</h4>
+                            <span class="text-[9px] px-2 py-1 rounded-lg font-black uppercase ${o.status === 'active' ? 'status-active' : 'status-inactive'}">
+                                ${o.status === 'active' ? 'ACTIVO' : 'EXPIRADO'}
+                            </span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">
+                            Usuario: ${o.user} <br/> Vence: ${o.expiryDate ? new Date(o.expiryDate).toLocaleDateString() : '---'}
+                        </div>
+                        ${o.whatsapp ? `<div class="text-[10px] text-emerald-600 font-bold uppercase mb-4"><i class="fab fa-whatsapp mr-1 text-sm"></i> ${o.whatsapp}</div>` : '<div class="mb-4 text-[10px] text-slate-300">Sin WhatsApp</div>'}
+                        ${o.customHtml ? `<div class="text-[10px] text-purple-600 font-bold mb-2"><i class="fas fa-code"></i> Usa HTML Propio</div>` : ''}
                     </div>
-                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4">
-                        Usuario: ${o.user} | Vence: ${o.expiryDate ? new Date(o.expiryDate).toLocaleDateString() : '---'}
-                    </div>
-                    <div class="flex gap-2 pt-4 border-t border-slate-50">
-                        <button onclick="editOwner('${o.id}')" class="flex-1 py-2 rounded-xl text-xs font-bold bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-colors">Editar</button>
-                        <button onclick="deleteOwner('${o.id}')" class="p-2 rounded-xl text-xs bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors"><i class="fas fa-trash"></i></button>
+                    
+                    <div>
+                        <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-50">
+                            <button onclick="editOwner('${o.id}')" class="flex-1 py-2 rounded-xl text-[10px] font-bold bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-colors shadow-sm border border-slate-100">Editar / Pago</button>
+                            <button onclick="openCustomHtmlModal('${o.id}')" class="flex-1 py-2 rounded-xl text-[10px] font-bold bg-purple-50 text-purple-600 hover:bg-purple-500 hover:text-white transition-colors shadow-sm border border-purple-100">HTML Único</button>
+                            <button onclick="deleteOwner('${o.id}')" class="p-2 w-10 rounded-xl text-[10px] bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors shadow-sm border border-red-100"><i class="fas fa-trash"></i></button>
+                        </div>
+                        
+                        ${o.whatsapp ? `
+                        <div class="flex gap-2 mt-2">
+                            ${o.status === 'active' ? `<a href="${waConfirmUrl}" target="_blank" class="flex-1 text-center py-2 rounded-xl text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors shadow-sm border border-emerald-100"><i class="fab fa-whatsapp"></i> Confirmar</a>` : ''}
+                            ${isExpiringSoon ? `<a href="${waRemindUrl}" target="_blank" class="flex-1 text-center py-2 rounded-xl text-[10px] font-black uppercase tracking-wider bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-colors shadow-sm border border-amber-100"><i class="fab fa-whatsapp"></i> Recordar Pago</a>` : ''}
+                        </div>
+                        ` : ''}
                     </div>
                 `;
+                card.innerHTML = htmlCard;
                 oList.appendChild(card);
             });
 
+            // Pagos pendientes
             const pList = document.getElementById('adminPaymentsList');
             pList.innerHTML = '';
             if(pending.length === 0) pList.innerHTML = '<tr><td class="text-center py-8 text-slate-400 font-medium italic">No hay pagos pendientes</td></tr>';
@@ -441,7 +567,7 @@
                                 <p class="font-black text-slate-800">${owner?.name || 'Desconocido'}</p>
                                 <p class="text-[9px] font-bold text-blue-500 uppercase tracking-widest">Pago Mensual: ₡4,000</p>
                             </div>
-                            <button onclick="reviewReceipt('${p.id}', '${p.receiptImg}')" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-800 shadow-lg">Ver Comprobante</button>
+                            <button onclick="reviewReceipt('${p.id}', '${p.receiptImg}')" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-800 shadow-lg"><i class="fas fa-eye mr-2"></i>Revisar</button>
                         </div>
                     </td>
                 `;
@@ -454,12 +580,25 @@
             const name = document.getElementById('newOwnerName').value.trim();
             const user = document.getElementById('newOwnerUser').value.trim();
             const pass = document.getElementById('newOwnerPass').value.trim();
+            const whatsapp = document.getElementById('newOwnerWhatsApp').value.trim();
             const id = document.getElementById('editOwnerId').value;
             
-            if(!name || !user || !pass) return alert("Por favor complete todos los campos.");
+            if(!name || !user || !pass) return alert("Por favor complete los campos obligatorios (Nombre, Usuario, Contraseña).");
 
             try {
-                const payload = { name, user, pass, status: id ? allOwners.find(o=>o.id===id).status : 'inactive' };
+                // Si existe el ID, preservar atributos viejos como customHtml
+                const existData = id ? allOwners.find(o=>o.id===id) : {};
+                
+                const payload = { 
+                    name, 
+                    user, 
+                    pass, 
+                    whatsapp,
+                    status: id ? existData.status : 'inactive' 
+                };
+
+                if(existData.customHtml) payload.customHtml = existData.customHtml;
+                
                 if(id) {
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id), payload);
                 } else {
@@ -467,10 +606,10 @@
                 }
                 alert("Guardado correctamente.");
                 closeModal('modalAddOwner');
-                document.getElementById('editOwnerId').value = "";
+                
             } catch (e) {
                 console.error("Error al guardar socio:", e);
-                alert("Error al guardar: Verifique los permisos de Firestore.");
+                alert("Error al guardar en Firestore.");
             }
         };
 
@@ -493,7 +632,7 @@
                         expiryDate: exp.toISOString() 
                     });
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', pId), { status: 'approved' });
-                    alert("Pago validado.");
+                    alert("Pago validado. El socio ya tiene acceso al sistema.");
                 } else {
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'payments', pId), { status: 'rejected' });
                     alert("Pago rechazado.");
@@ -520,6 +659,50 @@
             } catch (e) { console.error("Error subiendo HTML:", e); }
         };
 
+        // --- MANEJO DE HTML PERSONALIZADO POR SOCIO ---
+        window.openCustomHtmlModal = (id) => {
+            document.getElementById('targetUserHtmlId').value = id;
+            tempUserHtml = "";
+            document.getElementById('userFileNameLabel').innerText = "Subir HTML Exclusivo";
+            document.getElementById('userHtmlInput').value = "";
+            
+            const o = allOwners.find(x => x.id === id);
+            document.getElementById('userHtmlStatus').innerHTML = o.customHtml ? 
+                '<span class="text-purple-600"><i class="fas fa-check-circle"></i> Este socio ya tiene un HTML asignado.</span>' : 
+                'Este socio utiliza el HTML Global.';
+            
+            showModal('modalUserHTML');
+        };
+
+        window.readUserHtmlFile = (input) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                tempUserHtml = e.target.result;
+                document.getElementById('userFileNameLabel').innerText = input.files[0].name;
+            };
+            reader.readAsText(input.files[0]);
+        };
+
+        window.saveUserHtml = async () => {
+            const id = document.getElementById('targetUserHtmlId').value;
+            if(!tempUserHtml) return alert("Seleccione el archivo HTML primero.");
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id), { customHtml: tempUserHtml });
+                alert("HTML personalizado guardado exitosamente para este socio.");
+                closeModal('modalUserHTML');
+            } catch(e) { console.error("Error user html:", e); }
+        };
+
+        window.clearUserHtml = async () => {
+            const id = document.getElementById('targetUserHtmlId').value;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id), { customHtml: "" });
+                alert("HTML personalizado borrado. El socio volverá a usar el HTML Global.");
+                closeModal('modalUserHTML');
+            } catch(e) { console.error("Error clear user html:", e); }
+        };
+        // ---------------------------------------------
+
         window.updateMasterConfig = async () => {
             const pass = document.getElementById('admin_new_pass').value.trim();
             const simpe = document.getElementById('admin_new_simpe').value.trim();
@@ -537,6 +720,7 @@
         };
 
         function renderOwner() {
+            if(!currentOwnerData) return;
             document.getElementById('userNameDisplay').innerText = currentOwnerData.name;
             document.getElementById('expiryDisplay').innerText = currentOwnerData.expiryDate ? new Date(currentOwnerData.expiryDate).toLocaleDateString() : 'Pendiente';
 
@@ -545,6 +729,10 @@
             const title = document.getElementById('statusTitle');
             const msg = document.getElementById('statusMsg');
             const sysBtn = document.getElementById('ownerSystemBtn');
+            const uploadBtn = document.getElementById('btnUploadPayment');
+
+            // Verificar si hay pago en estado pendiente
+            const pendingPayment = allPayments.find(p => p.ownerId === currentOwnerData.id && p.status === 'pending');
 
             if(currentOwnerData.status === 'active') {
                 banner.className = "p-8 rounded-[2.5rem] border-2 status-active border-emerald-100 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm";
@@ -553,6 +741,15 @@
                 title.innerText = "Acceso Activo";
                 msg.innerText = "Bienvenido. Puede ingresar al sistema ahora.";
                 sysBtn.classList.remove('hidden');
+                uploadBtn.classList.add('hidden'); // Ocultar si esta activo
+            } else if (pendingPayment) {
+                banner.className = "p-8 rounded-[2.5rem] border-2 border-blue-100 bg-blue-50 text-blue-800 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm";
+                icon.className = "w-20 h-20 rounded-3xl flex items-center justify-center text-4xl bg-blue-200 text-blue-700 shadow-inner";
+                icon.innerHTML = '<i class="fas fa-hourglass-half"></i>';
+                title.innerText = "Reserva Exitosa";
+                msg.innerText = "Pronto estará siendo contactado para confirmar su suscripción mensual.";
+                sysBtn.classList.add('hidden');
+                uploadBtn.classList.add('hidden'); // Ocultar si ya subio comprobante
             } else {
                 banner.className = "p-8 rounded-[2.5rem] border-2 status-inactive border-red-100 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm";
                 icon.className = "w-20 h-20 rounded-3xl flex items-center justify-center text-4xl bg-red-200 text-red-700 shadow-inner";
@@ -560,23 +757,42 @@
                 title.innerText = "Acceso Suspendido";
                 msg.innerText = "Reporte su pago para desbloquear el sistema.";
                 sysBtn.classList.add('hidden');
+                uploadBtn.classList.remove('hidden'); // Mostrar para que pague
             }
         }
 
         window.launchSystem = () => {
             if(currentOwnerData.status !== 'active') return;
-            if(!configData.systemHtml) return alert("El sistema aún no ha sido cargado.");
+            
+            // Chequear si usa HTML custom o global
+            const targetHtml = currentOwnerData.customHtml ? currentOwnerData.customHtml : configData.systemHtml;
+            
+            if(!targetHtml) return alert("El sistema aún no ha sido cargado.");
             
             const container = document.getElementById('systemIframeContainer');
             const iframe = document.getElementById('appSandbox');
-            const blob = new Blob([configData.systemHtml], { type: 'text/html' });
+            const blob = new Blob([targetHtml], { type: 'text/html' });
             iframe.src = URL.createObjectURL(blob);
             container.style.display = 'block';
         };
 
-        window.closeSystem = () => {
-            document.getElementById('appSandbox').src = "about:blank";
-            document.getElementById('systemIframeContainer').style.display = 'none';
+        window.verifyAndCloseSystem = () => {
+            const passInput = document.getElementById('verifyClosePass').value.trim();
+            
+            let isOk = false;
+            if(currentUser === 'admin' && passInput === (configData.adminPass || 'master123')) isOk = true;
+            else if (currentUser === 'owner' && passInput === currentOwnerData.pass) isOk = true;
+
+            if(isOk) {
+                closeModal('modalVerifyClose');
+                document.getElementById('verifyClosePass').value = '';
+                
+                // Cierre real del iframe
+                document.getElementById('appSandbox').src = "about:blank";
+                document.getElementById('systemIframeContainer').style.display = 'none';
+            } else {
+                alert("Contraseña incorrecta. Acceso denegado.");
+            }
         };
 
         window.previewReceipt = (input) => {
@@ -599,37 +815,97 @@
                     receiptImg: tempReceipt,
                     date: new Date().toISOString()
                 });
-                alert("Comprobante enviado.");
+                alert("Pronto le estarán notificando que su reserva fue exitosa.");
                 closeModal('modalUploadPayment');
+                
+                // Limpiar upload
+                tempReceipt = null;
+                document.getElementById('receiptPreview').classList.add('hidden');
+                document.getElementById('receiptPlaceholder').classList.remove('hidden');
+                document.getElementById('receiptUpload').value = "";
+                
             } catch(e) { console.error("Error pago:", e); }
+        };
+
+        window.openFullscreen = (src) => {
+            if(!src) return;
+            document.getElementById('fullscreenImgSrc').src = src;
+            showModal('modalFullscreenImg');
         };
 
         window.generateReport = () => {
             const { jsPDF } = window.jspdf;
             const docPdf = new jsPDF();
-            docPdf.text("Reporte Maestro de Socios", 14, 20);
-            const tableData = allOwners.map(o => [o.name, o.user, o.status.toUpperCase(), o.expiryDate ? new Date(o.expiryDate).toLocaleDateString() : 'N/A']);
-            docPdf.autoTable({
-                startY: 30,
-                head: [['Negocio', 'Usuario', 'Estado', 'Vence']],
-                body: tableData
+            
+            docPdf.setFontSize(20);
+            docPdf.text("Reporte Maestro de Socios y Pagos", 14, 20);
+            docPdf.setFontSize(10);
+            docPdf.text(`Generado: ${new Date().toLocaleString()}`, 14, 28);
+            
+            let totalAmount = 0;
+
+            const trueTableData = allOwners.map(o => {
+                const amount = o.status === 'active' ? 4000 : 0;
+                totalAmount += amount;
+                return [
+                    o.name,
+                    o.user,
+                    o.whatsapp || 'N/A',
+                    o.status.toUpperCase(),
+                    `C ${amount.toLocaleString('es-CR')}`
+                ];
             });
-            docPdf.save("Reporte_Socios.pdf");
+
+            docPdf.autoTable({
+                startY: 35,
+                head: [['Negocio', 'Usuario', 'WhatsApp', 'Estado', 'Monto Pagado']],
+                body: trueTableData,
+                theme: 'striped',
+                headStyles: { fillColor: [15, 23, 42] }
+            });
+
+            docPdf.setFontSize(14);
+            docPdf.setFont("helvetica", "bold");
+            docPdf.text(`TOTAL RECAUDADO: C ${totalAmount.toLocaleString('es-CR')}`, 14, docPdf.lastAutoTable.finalY + 15);
+
+            docPdf.save(`Reporte_Socios_${new Date().toLocaleDateString()}.pdf`);
         };
 
-        window.showModal = (id) => document.getElementById(id).classList.remove('hidden');
+        window.showModal = (id) => {
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'modalVerifyClose') document.getElementById('verifyClosePass').focus();
+        };
         window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+        
         window.editOwner = (id) => {
             const o = allOwners.find(x => x.id === id);
             document.getElementById('ownerModalTitle').innerText = "Editar Socio";
-            document.getElementById('newOwnerName').value = o.name;
-            document.getElementById('newOwnerUser').value = o.user;
-            document.getElementById('newOwnerPass').value = o.pass;
+            document.getElementById('newOwnerName').value = o.name || "";
+            document.getElementById('newOwnerUser').value = o.user || "";
+            document.getElementById('newOwnerPass').value = o.pass || "";
+            document.getElementById('newOwnerWhatsApp').value = o.whatsapp || "";
             document.getElementById('editOwnerId').value = o.id;
+
+            // Mostrar el último comprobante subido por este usuario
+            const ownerPayments = allPayments.filter(p => p.ownerId === id);
+            const receiptSection = document.getElementById('receiptInEdit');
+            const receiptImg = document.getElementById('receiptInEditImg');
+
+            if(ownerPayments.length > 0) {
+                // Ordenar por fecha (el más reciente primero)
+                ownerPayments.sort((a,b) => new Date(b.date) - new Date(a.date));
+                receiptSection.classList.remove('hidden');
+                receiptImg.src = ownerPayments[0].receiptImg;
+            } else {
+                receiptSection.classList.add('hidden');
+                receiptImg.src = "";
+            }
+
             showModal('modalAddOwner');
         };
+
         window.deleteOwner = async (id) => {
-            if(confirm("¿Seguro que desea eliminar a este socio?")) {
+            if(confirm("¿Seguro que desea eliminar a este socio? Se perderá todo su historial y HTML asignado.")) {
                 try {
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id));
                 } catch(e) { console.error("Error delete:", e); }
