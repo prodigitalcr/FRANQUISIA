@@ -160,6 +160,7 @@
                             </button>
                         </div>
                     </div>
+                    <!-- Esta cuadrícula soporta cualquier cantidad de socios automáticamente -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="ownersList"></div>
                 </section>
 
@@ -323,12 +324,18 @@
                     <input id="newOwnerPass" type="password" placeholder="Clave" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold outline-none">
                 </div>
                 <input id="newOwnerWhatsApp" type="text" placeholder="Ej: 50688888888" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 font-semibold outline-none">
+                
+                <!-- Visor de comprobante modificado con hover para incentivar el click -->
                 <div id="receiptInEdit" class="hidden mt-4">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1"><i class="fas fa-receipt text-blue-500"></i> Último Comprobante</label>
-                    <div class="p-2 bg-slate-50 border border-slate-100 rounded-xl mt-1 cursor-zoom-in" onclick="openFullscreen(document.getElementById('receiptInEditImg').src)">
-                        <img id="receiptInEditImg" src="" class="w-full h-32 object-cover rounded-lg shadow-sm">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1"><i class="fas fa-receipt text-blue-500"></i> Último Comprobante Subido</label>
+                    <div class="p-2 bg-slate-50 border border-slate-100 rounded-xl mt-1 cursor-zoom-in relative group" onclick="openFullscreen(document.getElementById('receiptInEditImg').src)">
+                        <img id="receiptInEditImg" src="" class="w-full h-32 object-cover rounded-lg shadow-sm group-hover:opacity-60 transition-opacity">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            <span class="bg-black/70 text-white text-xs font-bold px-3 py-1.5 rounded-full"><i class="fas fa-search-plus mr-1"></i>Ver comprobante en grande</span>
+                        </div>
                     </div>
                 </div>
+
                 <div class="flex gap-3 pt-6">
                     <button onclick="closeModal('modalAddOwner')" class="flex-1 bg-slate-100 py-4 rounded-2xl font-bold text-slate-500">Cancelar</button>
                     <button onclick="saveNewOwner()" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Guardar</button>
@@ -547,6 +554,7 @@
                     if(diff > 0 && diff <= 24) isExpiringSoon = true;
                 }
                 const waNumber = o.whatsapp ? o.whatsapp.replace(/\D/g,'') : '';
+                const waGeneral = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola ${o.name}, te escribimos desde la administración de la plataforma.`)}`;
                 const waConfirm = `https://wa.me/${waNumber}?text=${encodeURIComponent(`¡Hola ${o.name}! Su suscripción ha sido confirmada hasta el ${new Date(o.expiryDate).toLocaleDateString()}.`)}`;
                 const waRemind = `https://wa.me/${waNumber}?text=${encodeURIComponent(`¡Hola ${o.name}! Su suscripción vence en menos de 24 horas. Reporte su pago para no perder acceso.`)}`;
 
@@ -562,13 +570,15 @@
                     </div>
                     <div class="space-y-2">
                         <div class="flex gap-2">
-                            <button onclick="editOwner('${o.id}')" class="flex-1 py-2 rounded-xl text-[10px] font-bold bg-slate-50 border">Editar</button>
-                            <button onclick="openCustomHtmlModal('${o.id}')" class="flex-1 py-2 rounded-xl text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-100">HTML Único</button>
+                            <button onclick="editOwner('${o.id}')" class="flex-1 py-2 rounded-xl text-[10px] font-bold bg-slate-50 border hover:bg-slate-100 transition-colors">Editar / Ver Pago</button>
+                            <button onclick="openCustomHtmlModal('${o.id}')" class="flex-1 py-2 rounded-xl text-[10px] font-bold bg-purple-50 text-purple-600 border border-purple-100 hover:bg-purple-100 transition-colors">HTML Único</button>
+                            <button onclick="deleteOwner('${o.id}')" class="w-10 flex-none py-2 rounded-xl text-[10px] font-bold bg-red-50 text-red-600 border border-red-100 hover:bg-red-500 hover:text-white transition-colors" title="Borrar este socio"><i class="fas fa-trash"></i></button>
                         </div>
                         ${o.whatsapp ? `
                             <div class="flex gap-2">
-                                <a href="${waConfirm}" target="_blank" class="flex-1 text-center py-2 rounded-xl text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">Confirmar</a>
-                                ${isExpiringSoon ? `<a href="${waRemind}" target="_blank" class="flex-1 text-center py-2 rounded-xl text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100">Recordar</a>` : ''}
+                                <a href="${waGeneral}" target="_blank" class="flex-1 text-center py-2 rounded-xl text-[10px] font-bold bg-green-50 text-green-600 border border-green-100 hover:bg-green-500 hover:text-white transition-colors"><i class="fab fa-whatsapp"></i> Chat</a>
+                                <a href="${waConfirm}" target="_blank" class="flex-1 text-center py-2 rounded-xl text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-500 hover:text-white transition-colors">Confirmar</a>
+                                ${isExpiringSoon ? `<a href="${waRemind}" target="_blank" class="flex-1 text-center py-2 rounded-xl text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100 hover:bg-amber-500 hover:text-white transition-colors">Recordar</a>` : ''}
                             </div>
                         ` : ''}
                     </div>
@@ -688,7 +698,7 @@
         // --- Funciones de Iframe y Modales Admin heredadas ---
         window.launchSystem = () => {
             const targetHtml = currentOwnerData.customHtml || configData.systemHtml;
-            if(!targetHtml) return alert("Sistema no cargated.");
+            if(!targetHtml) return alert("Sistema no cargado.");
             const container = document.getElementById('systemIframeContainer');
             const iframe = document.getElementById('appSandbox');
             const blob = new Blob([targetHtml], { type: 'text/html' });
@@ -777,6 +787,22 @@
             document.getElementById('newOwnerPass').value = o.pass;
             document.getElementById('newOwnerWhatsApp').value = o.whatsapp || "";
             document.getElementById('editOwnerId').value = o.id;
+
+            // Logica del comprobante
+            const ownerPayments = allPayments.filter(p => p.ownerId === id);
+            const receiptSection = document.getElementById('receiptInEdit');
+            const receiptImg = document.getElementById('receiptInEditImg');
+
+            if(ownerPayments.length > 0) {
+                // Ordenar por fecha (el más reciente primero)
+                ownerPayments.sort((a,b) => new Date(b.date) - new Date(a.date));
+                receiptSection.classList.remove('hidden');
+                receiptImg.src = ownerPayments[0].receiptImg;
+            } else {
+                receiptSection.classList.add('hidden');
+                receiptImg.src = "";
+            }
+
             showModal('modalAddOwner');
         };
         
@@ -787,7 +813,44 @@
         window.readUserHtmlFile = (i) => { const r = new FileReader(); r.onload=(e)=>{tempUserHtml=e.target.result;}; r.readAsText(i.files[0]); };
         window.saveUserHtml = async () => { const id = document.getElementById('targetUserHtmlId').value; if(tempUserHtml) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id), { customHtml: tempUserHtml }); closeModal('modalUserHTML'); };
         window.clearUserHtml = async () => { const id = document.getElementById('targetUserHtmlId').value; await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'business_owners', id), { customHtml: "" }); closeModal('modalUserHTML'); };
-        window.generateReport = () => { /* Logic for PDF generation same as before */ };
+        
+        window.generateReport = () => { 
+            const { jsPDF } = window.jspdf;
+            const docPdf = new jsPDF();
+            
+            docPdf.setFontSize(20);
+            docPdf.text("Reporte Maestro de Socios y Pagos", 14, 20);
+            docPdf.setFontSize(10);
+            docPdf.text(`Generado: ${new Date().toLocaleString()}`, 14, 28);
+            
+            let totalAmount = 0;
+
+            const trueTableData = allOwners.map(o => {
+                const amount = o.status === 'active' ? 4000 : 0;
+                totalAmount += amount;
+                return [
+                    o.name,
+                    o.user,
+                    o.whatsapp || 'N/A',
+                    o.status.toUpperCase(),
+                    `Colones ${amount.toLocaleString('es-CR')}`
+                ];
+            });
+
+            docPdf.autoTable({
+                startY: 35,
+                head: [['Negocio', 'Usuario', 'WhatsApp', 'Estado', 'Monto Pagado']],
+                body: trueTableData,
+                theme: 'striped',
+                headStyles: { fillColor: [15, 23, 42] }
+            });
+
+            docPdf.setFontSize(14);
+            docPdf.setFont("helvetica", "bold");
+            docPdf.text(`TOTAL RECAUDADO: Colones ${totalAmount.toLocaleString('es-CR')}`, 14, docPdf.lastAutoTable.finalY + 15);
+
+            docPdf.save(`Reporte_Socios_${new Date().toLocaleDateString()}.pdf`);
+        };
 
     </script>
 </body>
